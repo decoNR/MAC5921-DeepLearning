@@ -10,7 +10,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from torchvision import datasets
 
-from ep1.dataset import get_pipeline, split_dataset
+from ep1.dataset import create_dataloaders, get_pipeline
 
 MNIST_MEAN = (0.1307,)
 MNIST_STD = (0.3081,)
@@ -21,18 +21,35 @@ DATA_DIR = PROJECT_ROOT / "data"
 # Holds out 12,000 of the 60,000 training images for validation.
 VAL_SPLIT = 0.2
 
+BATCH_SIZE = 64
+
 
 def main() -> None:
-    """Builds the MNIST pipeline and splits the training set for validation."""
+    """Builds the MNIST loaders for training, validation and testing."""
     pipeline = get_pipeline(mean=MNIST_MEAN, std=MNIST_STD)
     training_data = datasets.MNIST(
         root=str(DATA_DIR), train=True, download=True, transform=pipeline
     )
-    train_data, val_data = split_dataset(training_data, VAL_SPLIT)
+    test_data = datasets.MNIST(
+        root=str(DATA_DIR), train=False, download=True, transform=pipeline
+    )
+    train_loader, val_loader, test_loader = create_dataloaders(
+        training_data,
+        test_dataset=test_data,
+        val_split=VAL_SPLIT,
+        batch_size=BATCH_SIZE,
+    )
 
     print(f"MNIST pipeline: {pipeline}")
-    print(f"Train samples: {len(train_data)}")
-    print(f"Validation samples: {len(val_data)}")
+    for name, loader in (
+        ("Train", train_loader),
+        ("Validation", val_loader),
+        ("Test", test_loader),
+    ):
+        print(
+            f"{name}: {len(loader.dataset)} samples in {len(loader)} batches "
+            f"of up to {loader.batch_size}"
+        )
 
 
 if __name__ == "__main__":
