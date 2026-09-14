@@ -11,15 +11,17 @@ if str(PROJECT_ROOT) not in sys.path:
 import torch
 from torch import nn
 
-from ep1.models import INPUT_SIZE, NUM_CLASSES, MLP, count_parameters
+from ep1.models import IMAGE_SIZE, INPUT_SIZE, NUM_CLASSES, CNN, MLP, count_parameters
 
 BATCH_SIZE = 3
 TOY_HIDDEN_SIZE = 5
 
 
-def make_image_batch(batch_size: int = BATCH_SIZE) -> torch.Tensor:
-    """Builds a batch of MNIST-shaped images filled with random pixels."""
-    return torch.rand(batch_size, 1, 28, 28)
+def make_image_batch(
+    batch_size: int = BATCH_SIZE, image_size: int = IMAGE_SIZE
+) -> torch.Tensor:
+    """Builds a batch of square images filled with random pixels."""
+    return torch.rand(batch_size, 1, image_size, image_size)
 
 
 class TestCountParameters(unittest.TestCase):
@@ -77,6 +79,42 @@ class TestMLP(unittest.TestCase):
         ) * NUM_CLASSES
 
         self.assertEqual(count_parameters(self.model), expected)
+
+
+class TestCNN(unittest.TestCase):
+    """Tests for CNN."""
+
+    def setUp(self) -> None:
+        """Creates the CNN shared by these tests."""
+        self.model = CNN()
+
+    def test_forward_gives_one_logit_per_class(self) -> None:
+        """A batch of images becomes a batch of class logits."""
+        logits = self.model(make_image_batch())
+
+        self.assertEqual(logits.shape, (BATCH_SIZE, NUM_CLASSES))
+
+    def test_forward_accepts_a_single_sample(self) -> None:
+        """The batch dimension may hold a single image."""
+        logits = self.model(make_image_batch(1))
+
+        self.assertEqual(logits.shape, (1, NUM_CLASSES))
+
+    def test_logits_are_not_probabilities(self) -> None:
+        """The output is unnormalized, as CrossEntropyLoss expects."""
+        logits = self.model(make_image_batch())
+
+        sums = logits.sum(dim=1)
+
+        self.assertFalse(torch.allclose(sums, torch.ones_like(sums)))
+
+    def test_forward_accepts_another_image_size(self) -> None:
+        """The classifier head is sized from the image_size given."""
+        model = CNN(image_size=32)
+
+        logits = model(make_image_batch(image_size=32))
+
+        self.assertEqual(logits.shape, (BATCH_SIZE, NUM_CLASSES))
 
 
 if __name__ == "__main__":
