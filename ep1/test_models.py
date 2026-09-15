@@ -11,7 +11,19 @@ if str(PROJECT_ROOT) not in sys.path:
 import torch
 from torch import nn
 
-from ep1.models import IMAGE_SIZE, INPUT_SIZE, NUM_CLASSES, CNN, MLP, count_parameters
+from ep1.models import (
+    IMAGE_SIZE,
+    INPUT_SIZE,
+    MNIST_HIDDEN_SIZE,
+    NUM_CLASSES,
+    PARAMETER_TOLERANCE,
+    CNN,
+    MLP,
+    count_parameters,
+    make_cnn,
+    make_mlp,
+)
+
 
 BATCH_SIZE = 3
 TOY_HIDDEN_SIZE = 5
@@ -115,6 +127,40 @@ class TestCNN(unittest.TestCase):
         logits = model(make_image_batch(image_size=32))
 
         self.assertEqual(logits.shape, (BATCH_SIZE, NUM_CLASSES))
+
+
+class TestExperimentModels(unittest.TestCase):
+    """Tests for the pair of models compared in the experiment."""
+
+    def setUp(self) -> None:
+        """Creates the two models the experiment trains."""
+        self.mlp = make_mlp()
+        self.cnn = make_cnn()
+
+    def test_models_have_comparable_parameter_counts(self) -> None:
+        """Neither network is given more capacity than the other."""
+        mlp_params = count_parameters(self.mlp)
+        cnn_params = count_parameters(self.cnn)
+
+        difference = abs(mlp_params - cnn_params) / min(mlp_params, cnn_params)
+
+        self.assertLessEqual(difference, PARAMETER_TOLERANCE)
+
+    def test_mlp_uses_the_matched_hidden_size(self) -> None:
+        """The MLP is the one sized to match the CNN's budget."""
+        expected = (INPUT_SIZE + 1) * MNIST_HIDDEN_SIZE + (
+            MNIST_HIDDEN_SIZE + 1
+        ) * NUM_CLASSES
+
+        self.assertEqual(count_parameters(self.mlp), expected)
+
+    def test_both_models_accept_mnist_images(self) -> None:
+        """Each model maps a batch of MNIST images to class logits."""
+        batch = make_image_batch()
+
+        for model in (self.mlp, self.cnn):
+            with self.subTest(model=type(model).__name__):
+                self.assertEqual(model(batch).shape, (BATCH_SIZE, NUM_CLASSES))
 
 
 if __name__ == "__main__":

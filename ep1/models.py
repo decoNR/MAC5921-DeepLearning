@@ -65,3 +65,38 @@ class CNN(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Maps a batch of images to a batch of class logits."""
         return self.layers(x)
+
+
+# Comparing the two architectures is only fair if neither gets more capacity
+# than the other, so the MLP is sized to match the CNN's budget of 52,138
+# parameters, computed layer by layer as follows:
+#
+#   Conv2d(1, 8, 3):             (1 * 3 * 3 + 1) * 8      =     80
+#   Conv2d(8, 16, 3):            (8 * 3 * 3 + 1) * 16     =  1,168
+#   Linear(16 * 7 * 7, 64):      (784 + 1) * 64           = 50,240
+#   Linear(64, 10):              (64 + 1) * 10            =    650
+#   --------------------------------------------------------------
+#   Total CNN:                                              52,138
+#
+# An MLP on MNIST with hidden size h holds:
+#   Linear(784, h):              (784 + 1) * h            =   785h
+#   Linear(h, 10):               (h + 1) * 10             = 10h + 10
+#   --------------------------------------------------------------
+#   Total MLP:                                            795h + 10
+#
+# Setting 795h + 10 = 52,138 gives h = 65.57, so the nearest whole layer size
+# is h = 66, yielding 795 * 66 + 10 = 52,480 parameters (+0.66% over the CNN).
+MNIST_HIDDEN_SIZE = 66
+
+# Both models stay within this fraction of each other's parameter count.
+PARAMETER_TOLERANCE = 0.02
+
+
+def make_mlp() -> MLP:
+    """Builds the fully connected network compared in the experiment."""
+    return MLP(hidden_size=MNIST_HIDDEN_SIZE)
+
+
+def make_cnn() -> CNN:
+    """Builds the convolutional network compared in the experiment."""
+    return CNN(image_size=IMAGE_SIZE)
