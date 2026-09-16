@@ -1,5 +1,6 @@
 """Tests for the training and evaluation routines."""
 
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -12,7 +13,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from ep1.train import evaluate, set_seed, train_model, train_one_epoch
+from ep1.train import evaluate, set_seed, summarize, train_model, train_one_epoch
 
 
 def make_toy_dataset() -> TensorDataset:
@@ -184,6 +185,77 @@ class TestTrainModel(unittest.TestCase):
         self.assertEqual(history["val_acc"], [])
 
 
+class TestSummarize(unittest.TestCase):
+    """Tests for summarize."""
+
+    def test_metrics_calculation(self) -> None:
+        """Synthetic hand-crafted history produces exact expected summary metrics."""
+        history = {
+            "train_loss": [0.6, 0.4, 0.2, 0.1],
+            "train_acc": [0.7, 0.85, 0.95, 0.98],
+            "val_loss": [0.5, 0.35, 0.25, 0.2],
+            "val_acc": [0.70, 0.90, 0.995, 1.0],
+            "epoch_time": [2.0, 4.0, 3.0, 1.0],
+        }
+        summary = summarize(
+            history,
+            model_name="MLP",
+            num_params=52480,
+            test_acc=0.975,
+        )
+
+        self.assertEqual(summary["model_name"], "MLP")
+        self.assertEqual(summary["num_params"], 52480)
+        self.assertEqual(summary["test_acc"], 0.975)
+        self.assertAlmostEqual(summary["best_val_acc"], 1.0)
+        self.assertEqual(summary["best_val_epoch"], 4)
+        self.assertEqual(summary["epochs_to_convergence"], 3)
+        self.assertAlmostEqual(summary["total_time"], 10.0)
+        self.assertAlmostEqual(summary["mean_epoch_time"], 2.5)
+
+    def test_json_serializability(self) -> None:
+        """The returned summary dictionary is JSON serializable."""
+        history = {
+            "train_loss": [0.5, 0.3],
+            "train_acc": [0.8, 0.9],
+            "val_loss": [0.5, 0.3],
+            "val_acc": [0.85, 0.95],
+            "epoch_time": [1.5, 2.5],
+        }
+        summary = summarize(history, "CNN", 52138, 0.98)
+        encoded = json.dumps(summary)
+        decoded = json.loads(encoded)
+        self.assertEqual(decoded, summary)
+
+    def test_immediate_convergence(self) -> None:
+        """When the first epoch achieves >= 99% of best accuracy, epochs_to_convergence is 1."""
+        history = {
+            "train_loss": [0.1, 0.05],
+            "train_acc": [0.98, 0.99],
+            "val_loss": [0.1, 0.05],
+            "val_acc": [0.98, 0.985],
+            "epoch_time": [2.0, 2.0],
+        }
+        summary = summarize(history, "CNN", 52138, 0.98)
+        self.assertEqual(summary["best_val_epoch"], 2)
+        self.assertEqual(summary["epochs_to_convergence"], 1)
+
+    def test_empty_validation_and_timing(self) -> None:
+        """Handles empty val_acc and epoch_time safely."""
+        history = {
+            "train_loss": [0.5],
+            "train_acc": [0.8],
+            "val_loss": [],
+            "val_acc": [],
+            "epoch_time": [],
+        }
+        summary = summarize(history, "MLP", 100, 0.5)
+        self.assertEqual(summary["best_val_acc"], 0.0)
+        self.assertEqual(summary["best_val_epoch"], 0)
+        self.assertEqual(summary["epochs_to_convergence"], 0)
+        self.assertEqual(summary["total_time"], 0.0)
+        self.assertEqual(summary["mean_epoch_time"], 0.0)
+
+
 if __name__ == "__main__":
     unittest.main()
-

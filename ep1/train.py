@@ -4,7 +4,7 @@ import random
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -159,4 +159,41 @@ def train_model(
             )
 
     return history
+
+
+def summarize(
+    history: Dict[str, List[float]],
+    model_name: str,
+    num_params: int,
+    test_acc: float,
+) -> Dict[str, Any]:
+    """Summarizes training metrics into a serializable dictionary."""
+    val_acc = history.get("val_acc", [])
+    if val_acc:
+        best_val_acc = max(val_acc)
+        best_val_epoch = val_acc.index(best_val_acc) + 1
+        threshold = 0.99 * best_val_acc
+        epochs_to_convergence = next(
+            (i + 1 for i, acc in enumerate(val_acc) if acc >= threshold),
+            best_val_epoch,
+        )
+    else:
+        best_val_acc = 0.0
+        best_val_epoch = 0
+        epochs_to_convergence = 0
+
+    epoch_times = history.get("epoch_time", [])
+    total_time = sum(epoch_times)
+    mean_epoch_time = total_time / len(epoch_times) if epoch_times else 0.0
+
+    return {
+        "model_name": model_name,
+        "num_params": int(num_params),
+        "best_val_acc": float(best_val_acc),
+        "best_val_epoch": int(best_val_epoch),
+        "epochs_to_convergence": int(epochs_to_convergence),
+        "mean_epoch_time": float(mean_epoch_time),
+        "total_time": float(total_time),
+        "test_acc": float(test_acc),
+    }
 
