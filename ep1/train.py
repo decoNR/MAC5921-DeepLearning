@@ -2,8 +2,9 @@
 
 import random
 import sys
+import time
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -97,4 +98,65 @@ def evaluate(
     accuracy = total_correct / total_samples if total_samples > 0 else 0.0
 
     return avg_loss, accuracy
+
+
+def train_model(
+    model: nn.Module,
+    train_loader: DataLoader,
+    val_loader: Optional[DataLoader] = None,
+    epochs: int = 15,
+    lr: float = 1e-3,
+    device: Optional[torch.device] = None,
+    seed: int = DEFAULT_SEED,
+) -> Dict[str, List[float]]:
+    """Trains a model across epochs using Adam and CrossEntropyLoss."""
+    set_seed(seed)
+
+    if device is None:
+        device = get_device()
+    model = model.to(device)
+
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+
+    history: Dict[str, List[float]] = {
+        "train_loss": [],
+        "train_acc": [],
+        "val_loss": [],
+        "val_acc": [],
+        "epoch_time": [],
+    }
+
+    for epoch in range(1, epochs + 1):
+        start_time = time.perf_counter()
+
+        train_loss, train_acc = train_one_epoch(
+            model, train_loader, criterion, optimizer, device
+        )
+
+        history["train_loss"].append(train_loss)
+        history["train_acc"].append(train_acc)
+
+        if val_loader is not None:
+            val_loss, val_acc = evaluate(model, val_loader, criterion, device)
+            history["val_loss"].append(val_loss)
+            history["val_acc"].append(val_acc)
+            elapsed = time.perf_counter() - start_time
+            history["epoch_time"].append(elapsed)
+            print(
+                f"Epoch {epoch:02d}/{epochs:02d} | "
+                f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.4f} | "
+                f"Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.4f} | "
+                f"Time: {elapsed:.2f}s"
+            )
+        else:
+            elapsed = time.perf_counter() - start_time
+            history["epoch_time"].append(elapsed)
+            print(
+                f"Epoch {epoch:02d}/{epochs:02d} | "
+                f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.4f} | "
+                f"Time: {elapsed:.2f}s"
+            )
+
+    return history
 

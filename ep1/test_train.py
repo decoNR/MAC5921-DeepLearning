@@ -12,7 +12,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from ep1.train import evaluate, set_seed, train_one_epoch
+from ep1.train import evaluate, set_seed, train_model, train_one_epoch
 
 
 def make_toy_dataset() -> TensorDataset:
@@ -105,5 +105,85 @@ class TestEvaluate(unittest.TestCase):
         self.assertEqual(acc, 1.0)
 
 
+class TestTrainModel(unittest.TestCase):
+    """Tests for train_model."""
+
+    def setUp(self) -> None:
+        """Sets up a toy dataset, dataloader, model, and device."""
+        self.device = torch.device("cpu")
+        self.dataset = make_toy_dataset()
+        self.loader = DataLoader(self.dataset, batch_size=2, shuffle=False)
+        self.model = nn.Linear(2, 2)
+
+    def test_history_keys_and_lengths(self) -> None:
+        """History contains all 5 keys with length equal to epochs when val_loader is given."""
+        epochs = 3
+        history = train_model(
+            self.model,
+            self.loader,
+            val_loader=self.loader,
+            epochs=epochs,
+            lr=0.01,
+            device=self.device,
+            seed=42,
+        )
+
+        expected_keys = {"train_loss", "train_acc", "val_loss", "val_acc", "epoch_time"}
+        self.assertEqual(set(history.keys()), expected_keys)
+        for key in expected_keys:
+            self.assertEqual(len(history[key]), epochs)
+
+    def test_same_seed_produces_identical_history(self) -> None:
+        """Training two identical models with the same seed yields the same history."""
+        torch.manual_seed(99)
+        model_a = nn.Linear(2, 2)
+        model_b = nn.Linear(2, 2)
+        model_b.load_state_dict(model_a.state_dict())
+
+        history_a = train_model(
+            model_a,
+            self.loader,
+            val_loader=self.loader,
+            epochs=3,
+            lr=0.01,
+            device=self.device,
+            seed=123,
+        )
+        history_b = train_model(
+            model_b,
+            self.loader,
+            val_loader=self.loader,
+            epochs=3,
+            lr=0.01,
+            device=self.device,
+            seed=123,
+        )
+
+        self.assertEqual(history_a["train_loss"], history_b["train_loss"])
+        self.assertEqual(history_a["train_acc"], history_b["train_acc"])
+        self.assertEqual(history_a["val_loss"], history_b["val_loss"])
+        self.assertEqual(history_a["val_acc"], history_b["val_acc"])
+
+    def test_works_without_val_loader(self) -> None:
+        """Without val_loader, validation keys remain empty while training keys have length epochs."""
+        epochs = 3
+        history = train_model(
+            self.model,
+            self.loader,
+            val_loader=None,
+            epochs=epochs,
+            lr=0.01,
+            device=self.device,
+            seed=42,
+        )
+
+        self.assertEqual(len(history["train_loss"]), epochs)
+        self.assertEqual(len(history["train_acc"]), epochs)
+        self.assertEqual(len(history["epoch_time"]), epochs)
+        self.assertEqual(history["val_loss"], [])
+        self.assertEqual(history["val_acc"], [])
+
+
 if __name__ == "__main__":
     unittest.main()
+
