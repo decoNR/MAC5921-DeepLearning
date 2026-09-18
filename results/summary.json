@@ -1,0 +1,22 @@
+{
+  "MLP": {
+    "model_name": "MLP",
+    "num_params": 52480,
+    "best_val_acc": 0.9711666666666666,
+    "best_val_epoch": 14,
+    "epochs_to_convergence": 3,
+    "mean_epoch_time": 14.312832017646482,
+    "total_time": 214.69248026469722,
+    "test_acc": 0.9728
+  },
+  "CNN": {
+    "model_name": "CNN",
+    "num_params": 52138,
+    "best_val_acc": 0.9884166666666667,
+    "best_val_epoch": 12,
+    "epochs_to_convergence": 2,
+    "mean_epoch_time": 16.835506210258853,
+    "total_time": 252.53259315388277,
+    "test_acc": 0.9879
+  }
+}
