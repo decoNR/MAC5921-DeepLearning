@@ -22,7 +22,7 @@ MNIST_MEAN = (0.1307,)
 MNIST_STD = (0.3081,)
 
 DATA_DIR = PROJECT_ROOT / "data"
-RESULTS_DIR = PROJECT_ROOT / "results"
+RESULTS_DIR = PROJECT_ROOT / "ep1" / "results"
 
 CURVES_PATH = RESULTS_DIR / "curves.png"
 SUMMARY_PATH = RESULTS_DIR / "summary.json"

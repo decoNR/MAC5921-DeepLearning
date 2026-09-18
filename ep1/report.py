@@ -147,7 +147,7 @@ def _format_comparison_table(summaries: Sequence[Dict[str, Any]]) -> str:
 
 def print_comparison(
     summaries: Union[Dict[str, Dict[str, Any]], Sequence[Dict[str, Any]]],
-    out_path: Optional[Union[str, Path]] = "results/summary.json",
+    out_path: Optional[Union[str, Path]] = "ep1/results/summary.json",
 ) -> str:
     """Prints a textual comparison table of model summaries and saves summary.json."""
     if isinstance(summaries, dict):
