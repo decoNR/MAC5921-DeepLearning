@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[margin=2.5cm]{geometry}
+\usepackage{array}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{float}
@@ -31,10 +32,28 @@ O código, incluindo este relatório feito em \LaTeX, pode ser encontrado em:
 \item \href{https://github.com/deconr/MAC5921-DeepLearning}{https://github.com/deconr/MAC5921-DeepLearning}.
 \end{itemize}
 
-\section{Planejamento dos experimentos}
+\section{Experimentos}
 
-\section{Descrição dos experimentos realizados}
+Essa seção descreve os experimentos realizados (incluindo o planejamento) e apresenta os resultados obtidos.
 
+\hypertarget{explicacao-dinamica-loss}{}Analisarei o valor da função de perda e da acurácia para os conjuntos de treinamento e validação ao longo do treinamento. É importante mencionar que, para o conjunto de treinamento, o valor final é uma média dos valores que são calculado para cada batch com os pesos atuais da rede (atualizados após cada batch), ou seja, cada valor de loss/acc é calculado para rede com pesos diferentes dentro de uma mesma época. Já para o conjunto de validação, o valor é calculado com os pesos congelados ao final da época.
+
+\subsection{Aspectos gerais}
+
+A ideia desse experimento é comparar NNs com CNNs, considerando aspectos gerais, sem modificar o dataset utilizado. Para isso, construí modelos com números similares de parâmetros e analisei o comportamento durante o treinamento e validação (\href{https://github.com/deconr/MAC5921-DeepLearning/blob/main/ep1/results/curves.png}{results/curves.png}). O resultado nos dados de teste também será mencionado.
+
+Isso explica o porquê os gráficos referentes ao treinmento iniciam com valores piores em relação a métrica avaliada. Por exemplo, no gráfico Loss / Epoch, o valor inicial das curvas de treinamento são bem maiores que o valor inicial das curvas de validação.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth} >{\raggedright\arraybackslash}p{0.25\textwidth} >{\raggedright\arraybackslash}p{0.21\textwidth} >{\raggedright\arraybackslash}p{0.22\textwidth}}
+\toprule
+\textbf{Análise} & \textbf{Treinamento} & \textbf{Validação} & \textbf{Considerações} \\
+\midrule
+Variação da loss ao longo das épocas (\href{https://github.com/deconr/MAC5921-DeepLearning/blob/main/ep1/results/curves.png}{curves.png}) & Cai muito nas duas primeiras épocas, o que é esperado dado que os pesos da rede começam com valores aleatórios. Percebe-se que já na primeira época a CNN associa-se a uma loss menor em relação a NN, o que continua sendo verdade por todo o treinamento. Também é possível perceber que a CNN converge mais rápido, o que reflete uma inclinação menor mais rapidamente quando comparada a curva da NN & Cai menos do que as curvas de treinamento nas primeiras épocas \hyperlink{explicacao-dinamica-loss}{(devido ao que foi explicado acima)}, porém a comparação também mostra que a CNN se associa a uma loss menor em relação a NN por todo o treinamento. A única diferença é que na validação as curvas convergem mais rápido e em tempos parecidos porém para um valor mais alto. A curva da CNN é levemente mais suave. & As análises do resultado confirmam o que já era esperado: a CNN teve um desempenho melhor, o que normalmente é atribuído ao fato de que a rede leva em considerção a localidade (convoluções que analisam pixels vizinhos), o que é uma caracteristica dos dados analisados (imagens). \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 
 \end{document}
