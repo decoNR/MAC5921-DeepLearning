@@ -1,6 +1,6 @@
 """Generic dataset pipeline utilities."""
 
-from typing import Optional, Sequence, Tuple, Union
+from typing import Any, Optional, Sequence, Tuple, Union
 
 import torch
 from torch.utils.data import DataLoader, Dataset, random_split
@@ -9,15 +9,72 @@ from torchvision import transforms
 DEFAULT_SEED = 44
 
 
+class AddGaussianNoise:
+    """Adds zero-mean Gaussian noise to a tensor image, clipping values to [0.0, 1.0]."""
+
+    def __init__(
+        self,
+        mean: float = 0.0,
+        std: float = 0.2,
+        clip: bool = True,
+        generator: Optional[torch.Generator] = None,
+    ) -> None:
+        """Initializes the Gaussian noise transform with mean and standard deviation."""
+        self.mean = mean
+        self.std = std
+        self.clip = clip
+        self.generator = generator
+
+    def __call__(self, tensor: torch.Tensor) -> torch.Tensor:
+        """Adds Gaussian noise to the input tensor."""
+        if self.generator is not None:
+            noise = (
+                torch.randn(
+                    tensor.shape,
+                    generator=self.generator,
+                    dtype=tensor.dtype,
+                    device=tensor.device,
+                )
+                * self.std
+                + self.mean
+            )
+        else:
+            noise = torch.randn_like(tensor) * self.std + self.mean
+
+        noisy = tensor + noise
+        if self.clip:
+            noisy = torch.clamp(noisy, 0.0, 1.0)
+        return noisy
+
+    def __repr__(self) -> str:
+        """Returns string representation of the transform."""
+        return (
+            f"{self.__class__.__name__}(mean={self.mean}, std={self.std}, "
+            f"clip={self.clip})"
+        )
+
+
 def get_pipeline(
     mean: Optional[Sequence[float]] = None,
     std: Optional[Sequence[float]] = None,
+    pre_transforms: Optional[Sequence[Any]] = None,
+    post_transforms: Optional[Sequence[Any]] = None,
 ) -> transforms.Compose:
     """Builds the transform pipeline applied to every sample.
 
     Converts inputs to tensors and, when mean and std are given, normalizes them.
+    Allows pre_transforms (applied before ToTensor) and post_transforms
+    (applied to tensors before normalization).
     """
-    ops = [transforms.ToTensor()]
+    ops = []
+    if pre_transforms:
+        ops.extend(pre_transforms)
+
+    ops.append(transforms.ToTensor())
+
+    if post_transforms:
+        ops.extend(post_transforms)
+
     if mean is not None and std is not None:
         ops.append(transforms.Normalize(mean=mean, std=std))
 

@@ -167,3 +167,41 @@ def print_comparison(
             json.dump(save_data, f, indent=2)
 
     return table
+
+
+def save_sample_images(
+    dataset: Any,
+    out_path: Union[str, Path],
+    num_samples: int = 8,
+    title: Optional[str] = None,
+) -> None:
+    """Saves a grid of sample images from a dataset to a PNG file."""
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    fig, axes = plt.subplots(1, num_samples, figsize=(num_samples * 1.6, 2.2))
+    if num_samples == 1:
+        axes = [axes]
+
+    for i in range(min(num_samples, len(dataset))):
+        sample = dataset[i]
+        img = sample[0]
+        label = sample[1] if len(sample) > 1 else None
+
+        if hasattr(img, "squeeze"):
+            img_np = img.squeeze().cpu().numpy()
+        else:
+            img_np = img
+
+        axes[i].imshow(img_np, cmap="gray")
+        if label is not None:
+            axes[i].set_title(f"Label: {label}", fontsize=9)
+        axes[i].axis("off")
+
+    if title:
+        fig.suptitle(title, fontsize=12)
+
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+

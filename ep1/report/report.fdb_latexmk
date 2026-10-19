@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1792372206.41392 "/home/andrenribeiro/projects/usp/MAC5921-DeepLearning/ep1/report/report.tex" "report.pdf" "report" 1792372206.62934 0
+["pdflatex"] 1792373848.41154 "/home/andrenribeiro/projects/usp/MAC5921-DeepLearning/ep1/report/report.tex" "report.pdf" "report" 1792373848.60623 0
   "/etc/texmf/web2c/texmf.cnf" 1792370472.31255 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/andrenribeiro/.texlive2026/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1095.600pk" 1792370517.63801 28952 1b27d5c0b487666581866a575cef6bcf ""
   "/home/andrenribeiro/.texlive2026/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk" 1792370518.31399 31928 de6c8729c6fb6baa2d74b9dbf98f721c ""
@@ -9,7 +9,7 @@
   "/home/andrenribeiro/.texlive2026/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk" 1792370521.68993 28416 ff4ac4a97bccad1fdaaa6dc9dbb06f24 ""
   "/home/andrenribeiro/.texlive2026/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1728.600pk" 1792370522.50194 42496 e8f67376760ab38b819c45c7c9b59bee ""
   "/home/andrenribeiro/.texlive2026/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1095.600pk" 1792370519.58197 12644 6c44efeafb2796181fa2782820bb2f0e ""
-  "/home/andrenribeiro/projects/usp/MAC5921-DeepLearning/ep1/report/report.tex" 1792372206.23443 4779 0c0c70daf95191599e515769da3aaaf1 ""
+  "/home/andrenribeiro/projects/usp/MAC5921-DeepLearning/ep1/report/report.tex" 1792373848.20934 4926 6c8c56df2842c0a44de726c1b2d1b877 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1095.tfm" 1136768653 3584 21b378cca2e40816b0e6d74a4dc98f04 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecbx1200.tfm" 1136768653 3584 402da0b29eafbad07963b1224b222f18 ""
@@ -76,9 +76,9 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1788183167 43205 33f18937154034ead298a2ae45aafb2e ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1792370486 128227 ed67923a37f7748d267799454bc1f95b ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1792370513 2251012 81d3bdb6356f35abc570d1ad32781df5 ""
-  "report.aux" 1792372206.59743 622 36a745dcd10cab585825d0fcf0ecf18d "pdflatex"
-  "report.out" 1792372206.59743 505 8cc7ccf8d50ac4ab7a7c60b74e60ed3e "pdflatex"
-  "report.tex" 1792372206.23443 4779 0c0c70daf95191599e515769da3aaaf1 ""
+  "report.aux" 1792373848.57918 622 36a745dcd10cab585825d0fcf0ecf18d "pdflatex"
+  "report.out" 1792373848.57918 505 8cc7ccf8d50ac4ab7a7c60b74e60ed3e "pdflatex"
+  "report.tex" 1792373848.20934 4926 6c8c56df2842c0a44de726c1b2d1b877 ""
   (generated)
   "report.aux"
   "report.log"

@@ -19,7 +19,12 @@ from torch.utils.data import (
 )
 from torchvision import transforms
 
-from ep1.dataset import create_dataloaders, get_pipeline, split_dataset
+from ep1.dataset import (
+    AddGaussianNoise,
+    create_dataloaders,
+    get_pipeline,
+    split_dataset,
+)
 
 # A 2x2 grayscale image with known pixel values, used as a didactic example.
 TOY_PIXELS = [0, 255, 0, 255]
@@ -88,6 +93,50 @@ class TestGetPipeline(unittest.TestCase):
         tensor = pipeline(make_toy_image())
 
         self.assertEqual(tensor.flatten().tolist(), [-1.0, 1.0, -1.0, 1.0])
+
+    def test_pipeline_with_pre_and_post_transforms(self) -> None:
+        """Pre-transforms run before ToTensor, post-transforms run after."""
+        class MockPre:
+            def __call__(self, img: Image.Image) -> Image.Image:
+                return img
+
+        class MockPost:
+            def __call__(self, tensor: torch.Tensor) -> torch.Tensor:
+                return tensor * 2.0
+
+        pipeline = get_pipeline(
+            pre_transforms=[MockPre()],
+            post_transforms=[MockPost()],
+        )
+        self.assertEqual(len(pipeline.transforms), 3)
+        self.assertIsInstance(pipeline.transforms[0], MockPre)
+        self.assertIsInstance(pipeline.transforms[1], transforms.ToTensor)
+        self.assertIsInstance(pipeline.transforms[2], MockPost)
+
+
+class TestAddGaussianNoise(unittest.TestCase):
+    """Tests for AddGaussianNoise."""
+
+    def test_noise_adds_perturbation_and_clips(self) -> None:
+        """Adding zero noise preserves tensor; noise clips to [0, 1]."""
+        tensor = torch.tensor([[0.0, 1.0], [0.5, 0.2]])
+        no_noise = AddGaussianNoise(mean=0.0, std=0.0)
+        self.assertTrue(torch.allclose(no_noise(tensor), tensor))
+
+        noisy = AddGaussianNoise(mean=10.0, std=1.0, clip=True)(tensor)
+        self.assertTrue(torch.all(noisy <= 1.0))
+        self.assertTrue(torch.all(noisy >= 0.0))
+
+    def test_reproducibility_with_generator(self) -> None:
+        """Using a seeded generator produces identical noise."""
+        tensor = torch.zeros(1, 4, 4)
+        gen1 = torch.Generator().manual_seed(42)
+        gen2 = torch.Generator().manual_seed(42)
+
+        noise1 = AddGaussianNoise(mean=0.0, std=0.2, generator=gen1)(tensor)
+        noise2 = AddGaussianNoise(mean=0.0, std=0.2, generator=gen2)(tensor)
+        self.assertTrue(torch.allclose(noise1, noise2))
+
 
 
 class TestSplitDataset(unittest.TestCase):

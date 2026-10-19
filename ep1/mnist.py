@@ -1,9 +1,8 @@
-"""Experiment script comparing MLP and CNN on the MNIST dataset."""
-
+import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -13,9 +12,9 @@ import torch
 from torch import nn
 from torchvision import datasets
 
-from ep1.dataset import DEFAULT_SEED, create_dataloaders, get_pipeline
+from ep1.dataset import DEFAULT_SEED, AddGaussianNoise, create_dataloaders, get_pipeline
 from ep1.models import count_parameters, make_cnn, make_mlp
-from ep1.visualization import plot_curves, print_comparison
+from ep1.visualization import plot_curves, print_comparison, save_sample_images
 from ep1.train import evaluate, get_device, set_seed, summarize, train_model
 
 MNIST_MEAN = (0.1307,)
@@ -23,10 +22,6 @@ MNIST_STD = (0.3081,)
 
 DATA_DIR = PROJECT_ROOT / "data"
 RESULTS_DIR = PROJECT_ROOT / "ep1" / "results"
-
-CURVES_PATH = RESULTS_DIR / "curves.png"
-SUMMARY_PATH = RESULTS_DIR / "summary.json"
-HISTORY_PATH = RESULTS_DIR / "history.json"
 
 # Holds out 12,000 of the 60,000 training images for validation.
 VAL_SPLIT = 0.2
@@ -36,29 +31,72 @@ LEARNING_RATE = 1e-3
 BATCH_SIZE = 64
 SEED = DEFAULT_SEED
 
+VALID_EXPERIMENTS = (
+    "baseline",
+    "noise_gaussian_std0.2",
+)
+
+
+def get_experiment_transforms(
+    experiment_name: str,
+) -> Tuple[Optional[Sequence[Any]], Optional[Sequence[Any]]]:
+    """Returns (pre_transforms, post_transforms) associated with an experiment name."""
+    if experiment_name == "baseline":
+        return None, None
+    elif experiment_name == "noise_gaussian_std0.2":
+        return None, [AddGaussianNoise(mean=0.0, std=0.2)]
+    else:
+        raise ValueError(
+            f"Invalid experiment_name '{experiment_name}'. "
+            f"Must be one of: {list(VALID_EXPERIMENTS)}"
+        )
+
 
 def run_experiment(
+    experiment_name: str = "baseline",
     epochs: int = EPOCHS,
     lr: float = LEARNING_RATE,
     batch_size: int = BATCH_SIZE,
     seed: int = SEED,
-    results_dir: Path = RESULTS_DIR,
+    results_dir: Optional[Path] = None,
     device: Optional[torch.device] = None,
 ) -> Tuple[Dict[str, Dict[str, List[float]]], Dict[str, Dict[str, Any]]]:
     """Executes the comparative experiment between MLP and CNN on MNIST."""
+    pre_transforms, post_transforms = get_experiment_transforms(experiment_name)
+
     if device is None:
         device = get_device()
     print(f"Using device: {device}")
+    print(f"Running experiment: '{experiment_name}'")
+
+    if results_dir is None:
+        results_dir = RESULTS_DIR / experiment_name
+
+    results_dir.mkdir(parents=True, exist_ok=True)
 
     set_seed(seed)
 
-    pipeline = get_pipeline(mean=MNIST_MEAN, std=MNIST_STD)
+    pipeline = get_pipeline(
+        mean=MNIST_MEAN,
+        std=MNIST_STD,
+        pre_transforms=pre_transforms,
+        post_transforms=post_transforms,
+    )
     training_data = datasets.MNIST(
         root=str(DATA_DIR), train=True, download=True, transform=pipeline
     )
     test_data = datasets.MNIST(
         root=str(DATA_DIR), train=False, download=True, transform=pipeline
     )
+
+    # Save visual sample of dataset images for inspection and report
+    save_sample_images(
+        training_data,
+        out_path=results_dir / "samples.png",
+        num_samples=8,
+        title=f"MNIST Samples: {experiment_name}",
+    )
+
     train_loader, val_loader, test_loader = create_dataloaders(
         training_data,
         test_dataset=test_data,
@@ -114,7 +152,6 @@ def run_experiment(
         summaries[model_name] = summary
 
     print("\n" + "=" * 20 + " Comparison " + "=" * 20)
-    results_dir.mkdir(parents=True, exist_ok=True)
     print_comparison(summaries, out_path=results_dir / "summary.json")
     plot_curves(histories, out_path=results_dir / "curves.png")
 
@@ -125,9 +162,55 @@ def run_experiment(
     return histories, summaries
 
 
+def parse_args() -> argparse.Namespace:
+    """Parses command-line arguments for experiment configuration."""
+    parser = argparse.ArgumentParser(
+        description="Run comparative MLP vs CNN experiments on MNIST."
+    )
+    parser.add_argument(
+        "--experiment",
+        type=str,
+        default="baseline",
+        help=f"Experiment to run. Must be one of: {list(VALID_EXPERIMENTS)}.",
+    )
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=EPOCHS,
+        help=f"Number of training epochs (default: {EPOCHS}).",
+    )
+    parser.add_argument(
+        "--lr",
+        type=float,
+        default=LEARNING_RATE,
+        help=f"Learning rate (default: {LEARNING_RATE}).",
+    )
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=BATCH_SIZE,
+        help=f"Batch size (default: {BATCH_SIZE}).",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=SEED,
+        help=f"Random seed (default: {SEED}).",
+    )
+    return parser.parse_args()
+
+
 def main() -> None:
     """Runs the training and comparison experiment between MLP and CNN on MNIST."""
-    run_experiment()
+    args = parse_args()
+
+    run_experiment(
+        experiment_name=args.experiment,
+        epochs=args.epochs,
+        lr=args.lr,
+        batch_size=args.batch_size,
+        seed=args.seed,
+    )
 
 
 if __name__ == "__main__":
