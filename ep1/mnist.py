@@ -15,7 +15,7 @@ from torchvision import datasets
 
 from ep1.dataset import DEFAULT_SEED, create_dataloaders, get_pipeline
 from ep1.models import count_parameters, make_cnn, make_mlp
-from ep1.report import plot_curves, print_comparison
+from ep1.visualization import plot_curves, print_comparison
 from ep1.train import evaluate, get_device, set_seed, summarize, train_model
 
 MNIST_MEAN = (0.1307,)

@@ -1,4 +1,4 @@
-"""Reporting utilities for model comparison and visualization."""
+"""Visualization and comparison utilities for model results."""
 
 import json
 import os
