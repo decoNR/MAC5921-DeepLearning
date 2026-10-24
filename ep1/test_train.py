@@ -207,6 +207,8 @@ class TestSummarize(unittest.TestCase):
         self.assertEqual(summary["model_name"], "MLP")
         self.assertEqual(summary["num_params"], 52480)
         self.assertEqual(summary["test_acc"], 0.975)
+        self.assertAlmostEqual(summary["best_train_acc"], 0.98)
+        self.assertEqual(summary["best_train_epoch"], 4)
         self.assertAlmostEqual(summary["best_val_acc"], 1.0)
         self.assertEqual(summary["best_val_epoch"], 4)
         self.assertEqual(summary["epochs_to_convergence"], 3)
@@ -250,6 +252,8 @@ class TestSummarize(unittest.TestCase):
             "epoch_time": [],
         }
         summary = summarize(history, "MLP", 100, 0.5)
+        self.assertAlmostEqual(summary["best_train_acc"], 0.8)
+        self.assertEqual(summary["best_train_epoch"], 1)
         self.assertEqual(summary["best_val_acc"], 0.0)
         self.assertEqual(summary["best_val_epoch"], 0)
         self.assertEqual(summary["epochs_to_convergence"], 0)

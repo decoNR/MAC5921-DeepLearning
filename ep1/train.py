@@ -168,6 +168,14 @@ def summarize(
     test_acc: float,
 ) -> Dict[str, Any]:
     """Summarizes training metrics into a serializable dictionary."""
+    train_acc = history.get("train_acc", [])
+    if train_acc:
+        best_train_acc = max(train_acc)
+        best_train_epoch = train_acc.index(best_train_acc) + 1
+    else:
+        best_train_acc = 0.0
+        best_train_epoch = 0
+
     val_acc = history.get("val_acc", [])
     if val_acc:
         best_val_acc = max(val_acc)
@@ -189,6 +197,8 @@ def summarize(
     return {
         "model_name": model_name,
         "num_params": int(num_params),
+        "best_train_acc": float(best_train_acc),
+        "best_train_epoch": int(best_train_epoch),
         "best_val_acc": float(best_val_acc),
         "best_val_epoch": int(best_val_epoch),
         "epochs_to_convergence": int(epochs_to_convergence),
