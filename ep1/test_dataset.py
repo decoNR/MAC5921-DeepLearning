@@ -23,6 +23,7 @@ from torchvision import transforms
 from ep1.dataset import (
     AddGaussianNoise,
     PerSampleSeededDataset,
+    RandomAxisTranslate,
     create_dataloaders,
     get_pipeline,
     split_dataset,
@@ -138,6 +139,95 @@ class TestAddGaussianNoise(unittest.TestCase):
         noise1 = AddGaussianNoise(mean=0.0, std=0.2, generator=gen1)(tensor)
         noise2 = AddGaussianNoise(mean=0.0, std=0.2, generator=gen2)(tensor)
         self.assertTrue(torch.allclose(noise1, noise2))
+
+
+def make_dot_image(row: int, col: int, size: int = 8) -> torch.Tensor:
+    """Builds a black 1 x size x size image with a single white pixel."""
+    image = torch.zeros(1, size, size)
+    image[0, row, col] = 1.0
+    return image
+
+
+def white_pixel(image: torch.Tensor) -> Tuple[int, int]:
+    """Returns the (row, col) of the only white pixel in a 1 x H x W image."""
+    rows, cols = torch.nonzero(image[0] == 1.0, as_tuple=True)
+    return int(rows), int(cols)
+
+
+class TestRandomAxisTranslateShift(unittest.TestCase):
+    """Tests for RandomAxisTranslate.shift."""
+
+    def test_positive_shifts_move_down_and_right(self) -> None:
+        """Positive dy moves content down; positive dx moves it right."""
+        shifted = RandomAxisTranslate.shift(make_dot_image(3, 3), dy=2, dx=1)
+        self.assertEqual(white_pixel(shifted), (5, 4))
+
+    def test_negative_shifts_move_up_and_left(self) -> None:
+        """Negative dy moves content up; negative dx moves it left."""
+        shifted = RandomAxisTranslate.shift(make_dot_image(3, 3), dy=-2, dx=-1)
+        self.assertEqual(white_pixel(shifted), (1, 2))
+
+    def test_zero_shift_is_identity(self) -> None:
+        """Shifting by (0, 0) returns an equal image."""
+        image = make_dot_image(3, 3)
+        self.assertTrue(torch.equal(RandomAxisTranslate.shift(image, 0, 0), image))
+
+    def test_content_past_the_border_is_dropped_not_wrapped(self) -> None:
+        """A pixel pushed out of the image disappears instead of wrapping."""
+        shifted = RandomAxisTranslate.shift(make_dot_image(7, 3), dy=2, dx=0)
+        self.assertEqual(shifted.sum().item(), 0.0)
+
+    def test_uncovered_pixels_take_the_fill_value(self) -> None:
+        """Rows exposed by the shift are filled with the given value."""
+        shifted = RandomAxisTranslate.shift(torch.ones(1, 8, 8), dy=2, dx=0, fill=-1.0)
+        self.assertTrue(torch.all(shifted[0, :2] == -1.0))
+        self.assertTrue(torch.all(shifted[0, 2:] == 1.0))
+
+    def test_shift_as_large_as_the_image_raises(self) -> None:
+        """Shifts that would empty the whole image are rejected."""
+        with self.assertRaises(ValueError):
+            RandomAxisTranslate.shift(make_dot_image(3, 3), dy=8, dx=0)
+
+
+class TestRandomAxisTranslate(unittest.TestCase):
+    """Tests for RandomAxisTranslate."""
+
+    def test_moves_by_exactly_the_given_pixels_along_one_axis(self) -> None:
+        """Every draw moves the content k pixels up, down, left or right."""
+        translate = RandomAxisTranslate(pixels=2)
+        expected = {(1, 4), (5, 4), (3, 2), (3, 6)}
+        for _ in range(50):
+            self.assertIn(white_pixel(translate(make_dot_image(3, 4))), expected)
+
+    def test_draws_all_four_directions(self) -> None:
+        """Over many draws, all four directions show up."""
+        translate = RandomAxisTranslate(
+            pixels=2, generator=torch.Generator().manual_seed(0)
+        )
+        positions = {
+            white_pixel(translate(make_dot_image(3, 4))) for _ in range(100)
+        }
+        self.assertEqual(positions, {(1, 4), (5, 4), (3, 2), (3, 6)})
+
+    def test_zero_pixels_is_identity(self) -> None:
+        """A zero-pixel translation leaves the image unchanged."""
+        image = make_dot_image(3, 4)
+        self.assertTrue(torch.equal(RandomAxisTranslate(pixels=0)(image), image))
+
+    def test_reproducibility_with_generator(self) -> None:
+        """Equally seeded generators give equal translations."""
+        first = RandomAxisTranslate(2, generator=torch.Generator().manual_seed(3))
+        second = RandomAxisTranslate(2, generator=torch.Generator().manual_seed(3))
+        for _ in range(10):
+            image = make_dot_image(3, 4)
+            self.assertTrue(torch.equal(first(image), second(image)))
+
+    def test_invalid_pixels_raise(self) -> None:
+        """Negative or non-integer shift sizes are rejected."""
+        with self.assertRaises(ValueError):
+            RandomAxisTranslate(pixels=-1)
+        with self.assertRaises(TypeError):
+            RandomAxisTranslate(pixels=1.5)  # type: ignore[arg-type]
 
 
 class NoisyToyDataset(Dataset):

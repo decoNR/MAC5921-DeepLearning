@@ -54,6 +54,61 @@ class AddGaussianNoise:
         )
 
 
+class RandomAxisTranslate:
+    """Shifts a tensor image by a fixed number of pixels in a random axis direction."""
+
+    DIRECTIONS = ((-1, 0), (1, 0), (0, -1), (0, 1))
+
+    def __init__(
+        self,
+        pixels: int,
+        fill: float = 0.0,
+        generator: Optional[torch.Generator] = None,
+    ) -> None:
+        """Initializes the transform with the shift size and the fill value."""
+        if isinstance(pixels, bool) or not isinstance(pixels, int):
+            raise TypeError(f"pixels must be an int, got {type(pixels).__name__}")
+        if pixels < 0:
+            raise ValueError(f"pixels must be non-negative, got {pixels}")
+        self.pixels = pixels
+        self.fill = fill
+        self.generator = generator
+
+    @staticmethod
+    def shift(
+        tensor: torch.Tensor, dy: int, dx: int, fill: float = 0.0
+    ) -> torch.Tensor:
+        """Shifts a tensor image by (dy, dx) pixels, filling uncovered pixels."""
+        height, width = tensor.shape[-2:]
+        if abs(dy) >= height or abs(dx) >= width:
+            raise ValueError(
+                f"Shift ({dy}, {dx}) must be smaller than the image size "
+                f"({height}, {width})"
+            )
+
+        shifted = torch.full_like(tensor, fill)
+        shifted[
+            ..., max(dy, 0) : height + min(dy, 0), max(dx, 0) : width + min(dx, 0)
+        ] = tensor[
+            ..., max(-dy, 0) : height + min(-dy, 0), max(-dx, 0) : width + min(-dx, 0)
+        ]
+        return shifted
+
+    def __call__(self, tensor: torch.Tensor) -> torch.Tensor:
+        """Shifts the input tensor in a randomly drawn axis direction."""
+        index = int(
+            torch.randint(len(self.DIRECTIONS), (1,), generator=self.generator)
+        )
+        unit_dy, unit_dx = self.DIRECTIONS[index]
+        return self.shift(
+            tensor, unit_dy * self.pixels, unit_dx * self.pixels, fill=self.fill
+        )
+
+    def __repr__(self) -> str:
+        """Returns string representation of the transform."""
+        return f"{self.__class__.__name__}(pixels={self.pixels}, fill={self.fill})"
+
+
 class PerSampleSeededDataset(Dataset):
     """Wraps a dataset so its random transforms give the same result per sample.
 

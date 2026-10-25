@@ -18,6 +18,7 @@ from ep1.dataset import (
     DEFAULT_SEED,
     AddGaussianNoise,
     PerSampleSeededDataset,
+    RandomAxisTranslate,
     create_dataloaders,
     get_pipeline,
 )
@@ -44,6 +45,8 @@ VALID_EXPERIMENTS = (
     "noise_gaussian_std0.2",
     "test_noise_gaussian_std0.2",
     "test_noise_gaussian_std0.3",
+    "test_translate_2px",
+    "test_translate_4px",
 )
 
 
@@ -73,6 +76,10 @@ def get_experiment_config(experiment_name: str) -> ExperimentConfig:
         return ExperimentConfig(
             test_post_transforms=[AddGaussianNoise(mean=0.0, std=0.3)]
         )
+    elif experiment_name == "test_translate_2px":
+        return ExperimentConfig(test_post_transforms=[RandomAxisTranslate(pixels=2)])
+    elif experiment_name == "test_translate_4px":
+        return ExperimentConfig(test_post_transforms=[RandomAxisTranslate(pixels=4)])
     else:
         raise ValueError(
             f"Invalid experiment_name '{experiment_name}'. "
