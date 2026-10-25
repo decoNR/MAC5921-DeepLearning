@@ -43,6 +43,7 @@ VALID_EXPERIMENTS = (
     "baseline",
     "noise_gaussian_std0.2",
     "test_noise_gaussian_std0.2",
+    "test_noise_gaussian_std0.3",
 )
 
 
@@ -67,6 +68,10 @@ def get_experiment_config(experiment_name: str) -> ExperimentConfig:
     elif experiment_name == "test_noise_gaussian_std0.2":
         return ExperimentConfig(
             test_post_transforms=[AddGaussianNoise(mean=0.0, std=0.2)]
+        )
+    elif experiment_name == "test_noise_gaussian_std0.3":
+        return ExperimentConfig(
+            test_post_transforms=[AddGaussianNoise(mean=0.0, std=0.3)]
         )
     else:
         raise ValueError(

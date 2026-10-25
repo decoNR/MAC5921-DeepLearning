@@ -1,0 +1,26 @@
+{
+  "MLP": {
+    "model_name": "MLP",
+    "num_params": 52480,
+    "best_train_acc": 0.9935416666666667,
+    "best_train_epoch": 15,
+    "best_val_acc": 0.9711666666666666,
+    "best_val_epoch": 14,
+    "epochs_to_convergence": 3,
+    "mean_epoch_time": 10.969225040335248,
+    "total_time": 164.5383756050287,
+    "test_acc": 0.8794
+  },
+  "CNN": {
+    "model_name": "CNN",
+    "num_params": 52138,
+    "best_train_acc": 0.9969791666666666,
+    "best_train_epoch": 14,
+    "best_val_acc": 0.9884166666666667,
+    "best_val_epoch": 12,
+    "epochs_to_convergence": 2,
+    "mean_epoch_time": 12.709388846935083,
+    "total_time": 190.64083270402625,
+    "test_acc": 0.9548
+  }
+}
