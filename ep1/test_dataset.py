@@ -3,7 +3,7 @@
 import sys
 import unittest
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -13,6 +13,7 @@ import torch
 from PIL import Image
 from torch.utils.data import (
     DataLoader,
+    Dataset,
     RandomSampler,
     SequentialSampler,
     TensorDataset,
@@ -21,6 +22,7 @@ from torchvision import transforms
 
 from ep1.dataset import (
     AddGaussianNoise,
+    PerSampleSeededDataset,
     create_dataloaders,
     get_pipeline,
     split_dataset,
@@ -136,6 +138,68 @@ class TestAddGaussianNoise(unittest.TestCase):
         noise1 = AddGaussianNoise(mean=0.0, std=0.2, generator=gen1)(tensor)
         noise2 = AddGaussianNoise(mean=0.0, std=0.2, generator=gen2)(tensor)
         self.assertTrue(torch.allclose(noise1, noise2))
+
+
+class NoisyToyDataset(Dataset):
+    """Mid-gray images passed through AddGaussianNoise, which uses the global RNG."""
+
+    def __init__(self, size: int = TOY_DATASET_SIZE) -> None:
+        """Builds size identical images, so any difference comes from the noise."""
+        self.images = torch.full((size, 1, 4, 4), 0.5)
+        self.labels = torch.arange(size)
+        self.noise = AddGaussianNoise(mean=0.0, std=0.2)
+
+    def __len__(self) -> int:
+        """Returns the number of samples."""
+        return len(self.labels)
+
+    def __getitem__(self, index: int) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Returns a freshly noised image and its label."""
+        return self.noise(self.images[index]), self.labels[index]
+
+
+class TestPerSampleSeededDataset(unittest.TestCase):
+    """Tests for PerSampleSeededDataset."""
+
+    def setUp(self) -> None:
+        """Builds a dataset whose samples change on every unseeded read."""
+        self.noisy = NoisyToyDataset()
+
+    def test_unwrapped_random_transform_changes_on_every_read(self) -> None:
+        """Without the wrapper, the same sample gets new noise each time."""
+        self.assertFalse(torch.equal(self.noisy[0][0], self.noisy[0][0]))
+
+    def test_preserves_length_and_labels(self) -> None:
+        """Wrapping changes neither the size nor the labels."""
+        seeded = PerSampleSeededDataset(self.noisy)
+        self.assertEqual(len(seeded), len(self.noisy))
+        for index in range(len(seeded)):
+            self.assertEqual(seeded[index][1], self.noisy.labels[index])
+
+    def test_same_sample_always_gets_the_same_output(self) -> None:
+        """Reading a sample twice, or through another wrapper, gives equal images."""
+        first = PerSampleSeededDataset(self.noisy, seed=7)
+        second = PerSampleSeededDataset(self.noisy, seed=7)
+        self.assertTrue(torch.equal(first[3][0], first[3][0]))
+        self.assertTrue(torch.equal(first[3][0], second[3][0]))
+
+    def test_different_samples_get_different_output(self) -> None:
+        """Identical clean images end up with different noise."""
+        seeded = PerSampleSeededDataset(self.noisy)
+        self.assertFalse(torch.equal(seeded[0][0], seeded[1][0]))
+
+    def test_different_seeds_give_different_output(self) -> None:
+        """The base seed selects which fixed noise each sample gets."""
+        first = PerSampleSeededDataset(self.noisy, seed=7)
+        second = PerSampleSeededDataset(self.noisy, seed=8)
+        self.assertFalse(torch.equal(first[0][0], second[0][0]))
+
+    def test_does_not_touch_the_global_rng(self) -> None:
+        """Reading samples leaves the global RNG state unchanged."""
+        seeded = PerSampleSeededDataset(self.noisy)
+        state = torch.get_rng_state()
+        _ = [seeded[index] for index in range(len(seeded))]
+        self.assertTrue(torch.equal(state, torch.get_rng_state()))
 
 
 

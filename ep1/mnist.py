@@ -1,6 +1,7 @@
 import argparse
 import json
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
@@ -10,9 +11,16 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import torch
 from torch import nn
+from torch.utils.data import Dataset
 from torchvision import datasets
 
-from ep1.dataset import DEFAULT_SEED, AddGaussianNoise, create_dataloaders, get_pipeline
+from ep1.dataset import (
+    DEFAULT_SEED,
+    AddGaussianNoise,
+    PerSampleSeededDataset,
+    create_dataloaders,
+    get_pipeline,
+)
 from ep1.models import count_parameters, make_cnn, make_mlp
 from ep1.visualization import plot_curves, print_comparison, save_sample_images
 from ep1.train import evaluate, get_device, set_seed, summarize, train_model
@@ -34,22 +42,62 @@ SEED = DEFAULT_SEED
 VALID_EXPERIMENTS = (
     "baseline",
     "noise_gaussian_std0.2",
+    "test_noise_gaussian_std0.2",
 )
 
 
-def get_experiment_transforms(
-    experiment_name: str,
-) -> Tuple[Optional[Sequence[Any]], Optional[Sequence[Any]]]:
-    """Returns (pre_transforms, post_transforms) associated with an experiment name."""
+@dataclass(frozen=True)
+class ExperimentConfig:
+    """Data transformations that define an experiment."""
+
+    # Applied to the training, validation and test sets alike.
+    pre_transforms: Optional[Sequence[Any]] = None
+    post_transforms: Optional[Sequence[Any]] = None
+    # Applied only to the test set, after the shared transforms above.
+    test_pre_transforms: Optional[Sequence[Any]] = None
+    test_post_transforms: Optional[Sequence[Any]] = None
+
+
+def get_experiment_config(experiment_name: str) -> ExperimentConfig:
+    """Returns the configuration associated with an experiment name."""
     if experiment_name == "baseline":
-        return None, None
+        return ExperimentConfig()
     elif experiment_name == "noise_gaussian_std0.2":
-        return None, [AddGaussianNoise(mean=0.0, std=0.2)]
+        return ExperimentConfig(post_transforms=[AddGaussianNoise(mean=0.0, std=0.2)])
+    elif experiment_name == "test_noise_gaussian_std0.2":
+        return ExperimentConfig(
+            test_post_transforms=[AddGaussianNoise(mean=0.0, std=0.2)]
+        )
     else:
         raise ValueError(
             f"Invalid experiment_name '{experiment_name}'. "
             f"Must be one of: {list(VALID_EXPERIMENTS)}"
         )
+
+
+def build_test_dataset(config: ExperimentConfig, seed: int) -> Dataset:
+    """Builds the MNIST test set with the shared and the test-only transforms."""
+    pipeline = get_pipeline(
+        mean=MNIST_MEAN,
+        std=MNIST_STD,
+        pre_transforms=[
+            *(config.pre_transforms or []),
+            *(config.test_pre_transforms or []),
+        ],
+        post_transforms=[
+            *(config.post_transforms or []),
+            *(config.test_post_transforms or []),
+        ],
+    )
+    test_data = datasets.MNIST(
+        root=str(DATA_DIR), train=False, download=True, transform=pipeline
+    )
+    return PerSampleSeededDataset(test_data, seed=seed)
+
+
+def has_test_only_transforms(config: ExperimentConfig) -> bool:
+    """Tells whether the test set is transformed differently from training."""
+    return bool(config.test_pre_transforms or config.test_post_transforms)
 
 
 def run_experiment(
@@ -62,7 +110,7 @@ def run_experiment(
     device: Optional[torch.device] = None,
 ) -> Tuple[Dict[str, Dict[str, List[float]]], Dict[str, Dict[str, Any]]]:
     """Executes the comparative experiment between MLP and CNN on MNIST."""
-    pre_transforms, post_transforms = get_experiment_transforms(experiment_name)
+    config = get_experiment_config(experiment_name)
 
     if device is None:
         device = get_device()
@@ -79,23 +127,27 @@ def run_experiment(
     pipeline = get_pipeline(
         mean=MNIST_MEAN,
         std=MNIST_STD,
-        pre_transforms=pre_transforms,
-        post_transforms=post_transforms,
+        pre_transforms=config.pre_transforms,
+        post_transforms=config.post_transforms,
     )
     training_data = datasets.MNIST(
         root=str(DATA_DIR), train=True, download=True, transform=pipeline
     )
-    test_data = datasets.MNIST(
-        root=str(DATA_DIR), train=False, download=True, transform=pipeline
-    )
+    test_data = build_test_dataset(config, seed)
 
-    # Save visual sample of dataset images for inspection and report
     save_sample_images(
         training_data,
         out_path=results_dir / "samples.png",
         num_samples=8,
-        title=f"MNIST Samples: {experiment_name}",
+        title=f"MNIST Training Samples: {experiment_name}",
     )
+    if has_test_only_transforms(config):
+        save_sample_images(
+            test_data,
+            out_path=results_dir / "samples_test.png",
+            num_samples=8,
+            title=f"MNIST Test Samples: {experiment_name}",
+        )
 
     train_loader, val_loader, test_loader = create_dataloaders(
         training_data,

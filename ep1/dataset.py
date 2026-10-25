@@ -54,6 +54,31 @@ class AddGaussianNoise:
         )
 
 
+class PerSampleSeededDataset(Dataset):
+    """Wraps a dataset so its random transforms give the same result per sample.
+
+    Each read of a sample runs under the global RNG seeded with seed + index,
+    so random transforms (e.g. AddGaussianNoise) produce identical output for
+    that sample on every read, across epochs and across models. The global RNG
+    state is restored afterwards, so reading samples never shifts other draws.
+    """
+
+    def __init__(self, dataset: Dataset, seed: int = DEFAULT_SEED) -> None:
+        """Initializes the wrapper with the dataset and the base seed."""
+        self.dataset = dataset
+        self.seed = seed
+
+    def __len__(self) -> int:
+        """Returns the number of samples in the wrapped dataset."""
+        return len(self.dataset)
+
+    def __getitem__(self, index: int) -> Any:
+        """Returns the sample at index, transformed under a per-sample seed."""
+        with torch.random.fork_rng(devices=[]):
+            torch.manual_seed(self.seed + index)
+            return self.dataset[index]
+
+
 def get_pipeline(
     mean: Optional[Sequence[float]] = None,
     std: Optional[Sequence[float]] = None,
