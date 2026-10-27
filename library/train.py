@@ -15,7 +15,7 @@ from torch import nn
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 
-from ep1.dataset import DEFAULT_SEED
+from library.dataset import DEFAULT_SEED
 
 
 def set_seed(seed: int = DEFAULT_SEED) -> None:

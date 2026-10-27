@@ -20,7 +20,7 @@ from torch.utils.data import (
 )
 from torchvision import transforms
 
-from ep1.dataset import (
+from library.dataset import (
     AddGaussianNoise,
     PerSampleSeededDataset,
     RandomAxisTranslate,

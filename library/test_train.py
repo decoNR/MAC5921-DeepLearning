@@ -13,7 +13,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from ep1.train import evaluate, set_seed, summarize, train_model, train_one_epoch
+from library.train import evaluate, set_seed, summarize, train_model, train_one_epoch
 
 
 def make_toy_dataset() -> TensorDataset:
