@@ -14,7 +14,11 @@ import torch
 from ep2.data import (
     FILE_NAME,
     CharVocabulary,
+    NextCharDataset,
+    SequenceDataset,
     build_corpus,
+    build_datasets,
+    create_text_dataloaders,
     download_tiny_shakespeare,
     load_text,
     split_data,
@@ -154,6 +158,178 @@ class TestDownload(unittest.TestCase):
         (out / FILE_NAME).write_text("cached", encoding="utf-8")
         path = download_tiny_shakespeare(out, self.url)
         self.assertEqual(load_text(path), "cached")
+
+
+class TestNextCharDataset(unittest.TestCase):
+    """Tests for the window -> next character dataset."""
+
+    def setUp(self) -> None:
+        """Uses 0..9 as tokens so that targets are easy to reason about."""
+        self.data = torch.arange(10)
+
+    def test_length(self) -> None:
+        """Every token after the first `context` ones is a target once."""
+        self.assertEqual(len(NextCharDataset(self.data, 3)), 7)
+
+    def test_items(self) -> None:
+        """The target is the token right after the window."""
+        dataset = NextCharDataset(self.data, 3)
+        x, y = dataset[0]
+        self.assertTrue(torch.equal(x, torch.tensor([0, 1, 2])))
+        self.assertEqual(y.item(), 3)
+        x, y = dataset[-1]
+        self.assertTrue(torch.equal(x, torch.tensor([6, 7, 8])))
+        self.assertEqual(y.item(), 9)
+
+    def test_shapes_and_dtype(self) -> None:
+        """x has shape (context,), y is a scalar, both long."""
+        x, y = NextCharDataset(self.data, 4)[2]
+        self.assertEqual(x.shape, (4,))
+        self.assertEqual(y.shape, ())
+        self.assertEqual(x.dtype, torch.long)
+
+    def test_context_one_is_bigram(self) -> None:
+        """With context=1 every pair of consecutive tokens is an example."""
+        dataset = NextCharDataset(self.data, 1)
+        self.assertEqual(len(dataset), 9)
+        pairs = [(x.item(), y.item()) for x, y in dataset]
+        self.assertEqual(pairs, [(i, i + 1) for i in range(9)])
+
+    def test_out_of_range_raises(self) -> None:
+        """Indexing past the end raises IndexError."""
+        dataset = NextCharDataset(self.data, 3)
+        with self.assertRaises(IndexError):
+            dataset[len(dataset)]
+
+    def test_invalid_arguments_raise(self) -> None:
+        """Non-positive contexts and too-short data are rejected."""
+        with self.assertRaises(ValueError):
+            NextCharDataset(self.data, 0)
+        with self.assertRaises(ValueError):
+            NextCharDataset(self.data, 10)
+        with self.assertRaises(TypeError):
+            NextCharDataset(self.data, 2.0)
+
+
+class TestSequenceDataset(unittest.TestCase):
+    """Tests for the sequence -> shifted sequence dataset."""
+
+    def setUp(self) -> None:
+        """Uses 0..10 as tokens so that targets are easy to reason about."""
+        self.data = torch.arange(11)
+
+    def test_target_is_input_shifted_by_one(self) -> None:
+        """y[t] is the token after x[t]."""
+        x, y = SequenceDataset(self.data, 4)[0]
+        self.assertTrue(torch.equal(x, torch.tensor([0, 1, 2, 3])))
+        self.assertTrue(torch.equal(y, torch.tensor([1, 2, 3, 4])))
+
+    def test_default_stride_gives_non_overlapping_chunks(self) -> None:
+        """11 tokens with seq_len=4 yield chunks starting at 0 and 4."""
+        dataset = SequenceDataset(self.data, 4)
+        self.assertEqual(len(dataset), 2)
+        x, y = dataset[1]
+        self.assertTrue(torch.equal(x, torch.tensor([4, 5, 6, 7])))
+        self.assertTrue(torch.equal(y, torch.tensor([5, 6, 7, 8])))
+
+    def test_last_chunk_fits_exactly(self) -> None:
+        """With 9 tokens and seq_len=4, the second target ends at the last token."""
+        dataset = SequenceDataset(torch.arange(9), 4)
+        self.assertEqual(len(dataset), 2)
+        _, y = dataset[-1]
+        self.assertEqual(y[-1].item(), 8)
+
+    def test_custom_stride(self) -> None:
+        """A stride of 1 yields every possible (overlapping) chunk."""
+        dataset = SequenceDataset(self.data, 4, stride=1)
+        self.assertEqual(len(dataset), 7)
+        x, _ = dataset[6]
+        self.assertTrue(torch.equal(x, torch.tensor([6, 7, 8, 9])))
+
+    def test_out_of_range_raises(self) -> None:
+        """Indexing past the end raises IndexError."""
+        dataset = SequenceDataset(self.data, 4)
+        with self.assertRaises(IndexError):
+            dataset[len(dataset)]
+
+    def test_invalid_arguments_raise(self) -> None:
+        """Non-positive lengths/strides and too-short data are rejected."""
+        with self.assertRaises(ValueError):
+            SequenceDataset(self.data, 0)
+        with self.assertRaises(ValueError):
+            SequenceDataset(self.data, 4, stride=0)
+        with self.assertRaises(ValueError):
+            SequenceDataset(self.data, 11)
+
+
+class TestBuildDatasets(unittest.TestCase):
+    """Tests for building datasets for every split."""
+
+    def setUp(self) -> None:
+        """Builds a corpus from a repeated toy text, long enough for every split."""
+        self.corpus = build_corpus(TOY_TEXT * 10, 0.8, 0.1)
+
+    def test_next_char_mode(self) -> None:
+        """next_char mode wraps each split in a NextCharDataset."""
+        datasets = build_datasets(self.corpus, "next_char", 5)
+        splits = (self.corpus.train_data, self.corpus.val_data, self.corpus.test_data)
+        for dataset, split in zip(datasets, splits):
+            self.assertIsInstance(dataset, NextCharDataset)
+            self.assertEqual(len(dataset), len(split) - 5)
+
+    def test_sequence_mode(self) -> None:
+        """sequence mode wraps each split in a SequenceDataset."""
+        for dataset in build_datasets(self.corpus, "sequence", 8):
+            self.assertIsInstance(dataset, SequenceDataset)
+            self.assertEqual(dataset.seq_len, 8)
+
+    def test_unknown_mode_raises(self) -> None:
+        """Unknown modes are rejected."""
+        with self.assertRaises(ValueError):
+            build_datasets(self.corpus, "images", 5)
+
+
+class TestCreateTextDataloaders(unittest.TestCase):
+    """Tests for the text dataloaders."""
+
+    def setUp(self) -> None:
+        """Builds small sequence datasets from 0..99."""
+        data = torch.arange(100)
+        self.train = SequenceDataset(data[:80], 4)
+        self.val = SequenceDataset(data[80:90], 4)
+        self.test = SequenceDataset(data[90:], 4)
+
+    def test_batch_shapes(self) -> None:
+        """Batches stack sequences into (batch, seq_len)."""
+        train_loader, _, _ = create_text_dataloaders(
+            self.train, self.val, self.test, batch_size=5
+        )
+        x, y = next(iter(train_loader))
+        self.assertEqual(x.shape, (5, 4))
+        self.assertEqual(y.shape, (5, 4))
+
+    def test_eval_loaders_are_not_shuffled(self) -> None:
+        """Validation batches keep the original order."""
+        _, val_loader, _ = create_text_dataloaders(
+            self.train, self.val, self.test, batch_size=5
+        )
+        x, _ = next(iter(val_loader))
+        self.assertTrue(torch.equal(x[0], torch.tensor([80, 81, 82, 83])))
+
+    def test_train_shuffle_is_reproducible(self) -> None:
+        """The same seed yields the same training order."""
+        orders = []
+        for _ in range(2):
+            loader, _, _ = create_text_dataloaders(
+                self.train, self.val, self.test, batch_size=20, seed=7
+            )
+            orders.append(next(iter(loader))[0])
+        self.assertTrue(torch.equal(orders[0], orders[1]))
+
+    def test_invalid_batch_size_raises(self) -> None:
+        """Non-positive batch sizes are rejected."""
+        with self.assertRaises(ValueError):
+            create_text_dataloaders(self.train, self.val, self.test, batch_size=0)
 
 
 if __name__ == "__main__":
