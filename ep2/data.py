@@ -170,7 +170,7 @@ def _normalize_index(idx: int, length: int) -> int:
 class NextCharDataset(Dataset):
     """Window of `context` characters -> the single next character.
 
-    Used by the bigram (context=1) and MLP models. Every position after the
+    Used by the MLP model. Every position after the
     first `context` characters is a target exactly once.
 
     Example (context=3) on "hello": ("hel" -> "l"), ("ell" -> "o").
@@ -249,7 +249,7 @@ def build_datasets(
 
     Args:
         corpus: Encoded and split corpus.
-        mode: "next_char" (bigram/MLP) or "sequence" (RNN/LSTM/GRU).
+        mode: "next_char" (MLP) or "sequence" (RNN/LSTM/GRU).
         length: The context size for "next_char" or seq_len for "sequence".
     """
     if mode == "next_char":

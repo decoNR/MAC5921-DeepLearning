@@ -188,7 +188,7 @@ class TestNextCharDataset(unittest.TestCase):
         self.assertEqual(y.shape, ())
         self.assertEqual(x.dtype, torch.long)
 
-    def test_context_one_is_bigram(self) -> None:
+    def test_context_one_gives_consecutive_pairs(self) -> None:
         """With context=1 every pair of consecutive tokens is an example."""
         dataset = NextCharDataset(self.data, 1)
         self.assertEqual(len(dataset), 9)
