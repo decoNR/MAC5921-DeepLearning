@@ -115,4 +115,3 @@ LSTM Test Loss: 1.7731 | Test Acc: 0.4865
 | GRU | 200 | 150,225 | 1.5428 | 10 | 1.7373 | 0.5012 | 17.3 |
 | LSTM | 173 | 150,578 | 1.5894 | 10 | 1.7731 | 0.4865 | 6.1 |
 
-Results saved to /usr/local/google/home/andrenribeiro/projects/usp/MAC5921-DeepLearning/ep2/results/baseline

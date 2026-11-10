@@ -225,7 +225,6 @@ def run_experiment(
     (results_dir / "samples.txt").write_text(
         format_samples(corpus.vocab.decode(prompt), samples), encoding="utf-8"
     )
-    print(f"\nResults saved to {results_dir}")
     return summaries
 
 
