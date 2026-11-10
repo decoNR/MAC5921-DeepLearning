@@ -1,0 +1,124 @@
+Prompt (temperature 0.8):
+?
+
+GREMIO:
+Good morrow, neighbour Baptista.
+
+BAPTISTA:
+Good morr
+
+==================== MLP (k=1) ====================
+e wn, o whe ce we'd ce se ce theys I tonousiromot th t opeshisoveatoo herourd po al the s ver my at l Wh thays s pacourerine we t we t and s that ind tole:
+
+
+Th d ws wharcomme a ppind thare and wonsut ollimyourerin; ard borercul, s ounde teaveritthe
+S:
+
+
+
+O, hareofogoushes bl angol, wilie ind d y woss bes t thend he s fowns: a my hin ireelim f hos hrmenofave s I GARD:
+
+
+Tour ndit.
+Whe that boonon 
+
+==================== MLP (k=3) ====================
+own unon my chiles the see nevery mustonguest then I name shorought:
+The with point the shere midaugh thy lays head
+And thy from my herence supposity to desires have most thy haven, as nor it this suppolling.
+
+LEONTES:
+Come, call shou set I'll shou shepher, be seeks.
+These blood older withing dischassions, and shou must wise a man in theely hat haver
+That valong and supplour not pray thy far of th
+
+==================== MLP (k=8) ====================
+ow no others beroments,
+Than runy,
+Shown, sir.
+
+EXETER:
+Ay, sir, a bose might point Phors to speak.
+
+BRUTUS:
+He shall be the boy.
+
+Clown:
+Testray in my love.
+
+GETES:
+Shall have grave! Inlly and both to lain,
+And, it arm bare comes house.
+
+CLARENCE:
+I shall suffery of such millangel, what bidding hath conses of Juliets,
+Not flatters
+And then he hath regel; and the queen as are sick you that boon to
+
+==================== MLP (k=16) ====================
+ow night his blood the sen and till thou went then I sakp she of your here in point endest thou day and therefore whose that every with not such a great us in the word save my helpings not in this sudered I wonder that I metchief should thee to him,
+This parden holy my heir love older of biguidess:
+Proush set in the stand.
+
+PRINCE EDWARD:
+Harry of him!
+
+Say the fair be now repeling
+Which tade in t
+
+==================== MLP (k=32) ====================
+ow nove the come so ceanse as fris dought sirvest.
+I 'Twaysh honestrove more are all the gords
+That a virtless sepiccest in the time.
+
+DETHA GAUN:
+Ay told: if so purge ance.m
+Se print and night: then villing
+And the hrome ancare, should to be reather:
+The nower how good might and let us.
+
+ASWINGAE:
+We brother will.
+
+CORIOLANUS:
+I pance mellius he jorthe park stay?
+
+KING RICHARD III:
+My watardophes
+
+==================== RNN ====================
+ow nover with you, I will not foy, I honous,
+To take of posts of you, and the poor men to very seat and recays in him over at my mother is soul this confectiest days of act my good past livient would villing to righ arm of traisons of the king interchanch and not sogosedving name of you.
+
+itied yourself and this and soft.
+
+A Vome pince they have starm not do stand and you are shall have done of th
+
+==================== GRU ====================
+ow, being your good consences forse,
+To you to the goodly short by you
+Show dare an enjoy more seat of your serve:
+Therefore we than the deest of the towe:
+We have see sacryme he pinast lives this suit;
+And when I cannot not call's purse.
+
+LADY CAPULET:
+Speak, if I go devil. I will see their brothers
+The mouth the pluck'd so foul pince that hath see
+Is that the earth that arm their house!
+O, thou 
+
+==================== LSTM ====================
+ow, in the guest somethers and
+Will, to you for the most your officers
+Thou dare all the here my hugh adricess of him of the worth;
+Not not suppelled to us in the word sacrymen happy,
+In repently state like well, and reconders and home;
+I'll prince I cannot be in this chost.
+
+SICINIUS:
+Buting do harse be me or soon in him.
+
+CORIOLANUS:
+I have those than take stand and your runsing you that boon!
+B
