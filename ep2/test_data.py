@@ -283,6 +283,13 @@ class TestBuildDatasets(unittest.TestCase):
             self.assertIsInstance(dataset, SequenceDataset)
             self.assertEqual(dataset.seq_len, 8)
 
+    def test_eval_length_applies_to_validation_and_test(self) -> None:
+        """eval_length changes only the validation and test datasets."""
+        train, val, test = build_datasets(self.corpus, "sequence", 8, eval_length=20)
+        self.assertEqual(train.seq_len, 8)
+        self.assertEqual(val.seq_len, 20)
+        self.assertEqual(test.seq_len, 20)
+
     def test_unknown_mode_raises(self) -> None:
         """Unknown modes are rejected."""
         with self.assertRaises(ValueError):

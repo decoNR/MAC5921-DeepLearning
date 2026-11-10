@@ -7,6 +7,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -111,6 +112,8 @@ class TestParseArgs(unittest.TestCase):
         self.assertEqual(args.epochs, 2)
         self.assertEqual(args.grad_clip, 0.0)
         self.assertEqual(parse_args([]).name, "baseline")
+        self.assertEqual(parse_args([]).eval_seq_len, 1000)
+        self.assertEqual(parse_args(["--eval-seq-len", "100"]).eval_seq_len, 100)
 
 
 class TestRunExperiment(unittest.TestCase):
@@ -126,8 +129,8 @@ class TestRunExperiment(unittest.TestCase):
             with contextlib.redirect_stdout(io.StringIO()):
                 summaries = run_experiment(
                     model_specs=specs, epochs=1, budget=5_000, seq_len=10,
-                    tokens_per_batch=50, sample_length=20, corpus=corpus,
-                    results_dir=out, device=torch.device("cpu"),
+                    eval_seq_len=40, tokens_per_batch=50, sample_length=20,
+                    corpus=corpus, results_dir=out, device=torch.device("cpu"),
                 )
             self.assertEqual(set(summaries), {"MLP (k=4)", "GRU"})
             for name in ("curves.png", "history.json", "summary.json", "samples.txt"):
@@ -135,6 +138,20 @@ class TestRunExperiment(unittest.TestCase):
             saved = json.loads((out / "summary.json").read_text())
             self.assertEqual(saved["GRU"]["best_epoch"], 1)
             self.assertIn("MLP (k=4)", (out / "samples.txt").read_text())
+
+    def test_default_results_dir_ends_with_eval_seq_len(self) -> None:
+        """Without results_dir, results go to RESULTS_DIR/<name>_<eval_seq_len>."""
+        text = "First Citizen:\nBefore we proceed any further, hear me speak.\n" * 30
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch("ep2.shakespeare.RESULTS_DIR", Path(tmp)):
+                with contextlib.redirect_stdout(io.StringIO()):
+                    run_experiment(
+                        experiment_name="quick", model_specs=[ModelSpec("rnn")],
+                        epochs=1, budget=2_000, seq_len=10, eval_seq_len=40,
+                        tokens_per_batch=50, sample_length=5,
+                        corpus=build_corpus(text), device=torch.device("cpu"),
+                    )
+            self.assertTrue((Path(tmp) / "quick_40" / "summary.json").exists())
 
 
 if __name__ == "__main__":

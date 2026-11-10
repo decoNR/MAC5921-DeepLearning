@@ -243,7 +243,7 @@ class SequenceDataset(Dataset):
 
 
 def build_datasets(
-    corpus: TextCorpus, mode: str, length: int
+    corpus: TextCorpus, mode: str, length: int, eval_length: Optional[int] = None
 ) -> Tuple[Dataset, Dataset, Dataset]:
     """Builds train, validation and test datasets for a model family.
 
@@ -251,6 +251,9 @@ def build_datasets(
         corpus: Encoded and split corpus.
         mode: "next_char" (MLP) or "sequence" (RNN/LSTM/GRU).
         length: The context size for "next_char" or seq_len for "sequence".
+        eval_length: Length for the validation and test datasets; defaults to
+            `length`. Longer evaluation sequences let a recurrent model carry
+            its state further, so fewer predictions start without context.
     """
     if mode == "next_char":
         factory = NextCharDataset
@@ -258,9 +261,12 @@ def build_datasets(
         factory = SequenceDataset
     else:
         raise ValueError(f"mode must be one of {DATASET_MODES}, got {mode!r}")
-    return tuple(
-        factory(split, length)
-        for split in (corpus.train_data, corpus.val_data, corpus.test_data)
+    if eval_length is None:
+        eval_length = length
+    return (
+        factory(corpus.train_data, length),
+        factory(corpus.val_data, eval_length),
+        factory(corpus.test_data, eval_length),
     )
 
 

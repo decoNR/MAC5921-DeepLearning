@@ -10,7 +10,8 @@ Every model gets:
   batch `tokens_per_batch / seq_len` sequences (seq_len predictions each).
 
 Usage:
-    python ep2/shakespeare.py
+    python ep2/shakespeare.py                       # -> ep2/results/baseline_1000
+    python ep2/shakespeare.py --eval-seq-len 100    # -> ep2/results/baseline_100
     python ep2/shakespeare.py --models mlp:1 mlp:8 lstm --epochs 5 --name quick
 """
 
@@ -47,6 +48,8 @@ DEFAULT_MODELS = ("mlp:1", "mlp:3", "mlp:8", "mlp:16", "mlp:32", "rnn", "gru", "
 EMBED_DIM = 24
 PARAMETER_BUDGET = 150_000
 SEQ_LEN = 100
+# Recurrent models are evaluated on longer sequences than they train on.
+EVAL_SEQ_LEN = 1000
 TOKENS_PER_BATCH = 3_200
 EPOCHS = 10
 LEARNING_RATE = 2e-3
@@ -151,6 +154,7 @@ def run_experiment(
     budget: int = PARAMETER_BUDGET,
     embed_dim: int = EMBED_DIM,
     seq_len: int = SEQ_LEN,
+    eval_seq_len: int = EVAL_SEQ_LEN,
     tokens_per_batch: int = TOKENS_PER_BATCH,
     grad_clip: Optional[float] = DEFAULT_GRAD_CLIP,
     sample_length: int = SAMPLE_LENGTH,
@@ -161,13 +165,16 @@ def run_experiment(
 ) -> Dict[str, Dict[str, Any]]:
     """Trains every model, evaluates it on the test split and saves the results.
 
+    Recurrent models train on `seq_len` sequences but are validated and tested
+    on `eval_seq_len` ones, so that fewer predictions start from an empty state.
+
     Writes curves.png, history.json, summary.json and samples.txt to
-    results_dir (ep2/results/<experiment_name> by default).
+    results_dir (ep2/results/<experiment_name>_<eval_seq_len> by default).
     """
     if corpus is None:
         corpus = load_tiny_shakespeare()
     if results_dir is None:
-        results_dir = RESULTS_DIR / experiment_name
+        results_dir = RESULTS_DIR / f"{experiment_name}_{eval_seq_len}"
     if device is None:
         device = get_device()
     results_dir.mkdir(parents=True, exist_ok=True)
@@ -186,9 +193,12 @@ def run_experiment(
         num_params = count_parameters(model)
         print(f"\n{'=' * 20} {spec.name}: hidden={hidden}, params={num_params:,} {'=' * 20}")
 
-        mode, length = ("next_char", spec.context) if spec.kind == "mlp" else ("sequence", seq_len)
+        if spec.kind == "mlp":
+            datasets = build_datasets(corpus, "next_char", spec.context)
+        else:
+            datasets = build_datasets(corpus, "sequence", seq_len, eval_seq_len)
         train_loader, val_loader, test_loader = create_text_dataloaders(
-            *build_datasets(corpus, mode, length),
+            *datasets,
             batch_size=batch_size_for(spec, tokens_per_batch, seq_len),
             seed=seed,
         )
@@ -254,7 +264,10 @@ def format_samples(prompt: str, samples: Dict[str, str]) -> str:
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     """Parses command-line arguments."""
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("--name", default="baseline", help="Results subdirectory name.")
+    parser.add_argument(
+        "--name", default="baseline",
+        help="Results go to ep2/results/<name>_<eval-seq-len>.",
+    )
     parser.add_argument(
         "--models", nargs="+", default=list(DEFAULT_MODELS),
         help="Models to compare: mlp:<k>, rnn, gru and/or lstm.",
@@ -265,7 +278,13 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         "--budget", type=int, default=PARAMETER_BUDGET,
         help="Target number of trainable parameters for every model.",
     )
-    parser.add_argument("--seq-len", type=int, default=SEQ_LEN, help="RNN sequence length.")
+    parser.add_argument(
+        "--seq-len", type=int, default=SEQ_LEN, help="RNN training sequence length."
+    )
+    parser.add_argument(
+        "--eval-seq-len", type=int, default=EVAL_SEQ_LEN,
+        help="RNN validation/test sequence length.",
+    )
     parser.add_argument(
         "--tokens-per-batch", type=int, default=TOKENS_PER_BATCH,
         help="Predicted characters per optimizer step, for every model.",
@@ -288,6 +307,7 @@ def main() -> None:
         lr=args.lr,
         budget=args.budget,
         seq_len=args.seq_len,
+        eval_seq_len=args.eval_seq_len,
         tokens_per_batch=args.tokens_per_batch,
         grad_clip=args.grad_clip if args.grad_clip > 0 else None,
         seed=args.seed,
