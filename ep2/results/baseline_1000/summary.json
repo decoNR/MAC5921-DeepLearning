@@ -1,0 +1,82 @@
+{
+  "MLP (k=1)": {
+    "model_name": "MLP (k=1)",
+    "hidden_size": 1649,
+    "num_params": 150035,
+    "best_val_loss": 2.500945910978421,
+    "best_epoch": 31,
+    "test_loss": 2.507213879858965,
+    "test_acc": 0.26482216982400775,
+    "mean_epoch_time": 26.308660751924617
+  },
+  "MLP (k=3)": {
+    "model_name": "MLP (k=3)",
+    "hidden_size": 1075,
+    "num_params": 149975,
+    "best_val_loss": 1.7186985575576506,
+    "best_epoch": 29,
+    "test_loss": 1.949033542117243,
+    "test_acc": 0.44482100110277306,
+    "mean_epoch_time": 22.148299087112537
+  },
+  "MLP (k=8)": {
+    "model_name": "MLP (k=8)",
+    "hidden_size": 575,
+    "num_params": 149975,
+    "best_val_loss": 1.6189193558525552,
+    "best_epoch": 10,
+    "test_loss": 1.806200573191523,
+    "test_acc": 0.48442599433346484,
+    "mean_epoch_time": 17.184509939077543
+  },
+  "MLP (k=16)": {
+    "model_name": "MLP (k=16)",
+    "hidden_size": 330,
+    "num_params": 150125,
+    "best_val_loss": 1.6955433717416237,
+    "best_epoch": 12,
+    "test_loss": 1.8944032010900071,
+    "test_acc": 0.46561278289874825,
+    "mean_epoch_time": 17.328409838094377
+  },
+  "MLP (k=32)": {
+    "model_name": "MLP (k=32)",
+    "hidden_size": 178,
+    "num_params": 150077,
+    "best_val_loss": 1.775561932717489,
+    "best_epoch": 11,
+    "test_loss": 1.9509879702983262,
+    "test_acc": 0.4466585357104423,
+    "mean_epoch_time": 19.010056388872908
+  },
+  "RNN": {
+    "model_name": "RNN",
+    "hidden_size": 342,
+    "num_params": 149711,
+    "best_val_loss": 1.5528644613317542,
+    "best_epoch": 17,
+    "test_loss": 1.75785831932549,
+    "test_acc": 0.49833333333333335,
+    "mean_epoch_time": 18.257401279284387
+  },
+  "GRU": {
+    "model_name": "GRU",
+    "hidden_size": 200,
+    "num_params": 150225,
+    "best_val_loss": 1.4973933782663431,
+    "best_epoch": 16,
+    "test_loss": 1.7173732798378747,
+    "test_acc": 0.5127837837837838,
+    "mean_epoch_time": 28.71999723670306
+  },
+  "LSTM": {
+    "model_name": "LSTM",
+    "hidden_size": 173,
+    "num_params": 150578,
+    "best_val_loss": 1.5106465161383689,
+    "best_epoch": 26,
+    "test_loss": 1.7632041471498507,
+    "test_acc": 0.5073423423423423,
+    "mean_epoch_time": 8.58205172427115
+  }
+}

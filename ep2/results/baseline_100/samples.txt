@@ -8,29 +8,25 @@ BAPTISTA:
 Good morr
 
 ==================== MLP (k=1) ====================
-e wn, o whe ce we'd ce se ce theys I tonousiromot th t opeshisoveatoo herourd po al the s ver my at l Wh thays s pacourerine we t we t and s that ind tole:
+r wn, o whe ce re'd ce se ce thoysour ofousirom t th n oposhisoveairo herour aro al thex here m.
+ANo g d tlays s phathot ine we t wet tand is
+Go sind tole:
 
 
-Th d ws wharcomme a ppind thare and wonsut ollimyourerin; ard borercul, s ounde teaveritthe
+Th d ws wharcommy a ppind my, n and wousu vellir we arin; arder y coul, s oulle teaveritt d
 S:
 
-
-
-O, hareofogoushes bl angol, wilie ind d y woss bes t thend he s fowns: a my hin ireelim f hos hrmenofave s I GARD:
-
-
-Tour ndit.
-Whe that boonon 
+A aly:
+Beofogouches bl angol, wice bind disharss bes t HENIZAnd s fowns: Vomy hind wielim f hom hrmenofave s I GARIFis sour ndicemy, t wat boo he 
 
 ==================== MLP (k=3) ====================
-own unon my chiles the see nevery mustonguest then I name shorought:
-The with point the shere midaugh thy lays head
-And thy from my herence supposity to desires have most thy haven, as nor it this suppolling.
+owned,
+Why, and o' the wer ne'ery or to you for true of post soves of him the point Pomfor Glous anger dring do spicilitting be thee trant is thy wife of your sover-boose thy he peoplean, not this suddeland werer: ther cond could should ther true me
+Third as I did himselve blood older withing dischose I she shall himself.
 
-LEONTES:
-Come, call shou set I'll shou shepher, be seeks.
-These blood older withing dischassions, and shou must wise a man in theely hat haver
-That valong and supplour not pray thy far of th
+AUFIDIUS:
+Perd:
+Rich her him not mark and and you arench a you the seen he 
 
 ==================== MLP (k=8) ====================
 ow no others beroments,
@@ -56,69 +52,85 @@ Not flatters
 And then he hath regel; and the queen as are sick you that boon to
 
 ==================== MLP (k=16) ====================
-ow night his blood the sen and till thou went then I sakp she of your here in point endest thou day and therefore whose that every with not such a great us in the word save my helpings not in this sudered I wonder that I metchief should thee to him,
-This parden holy my heir love older of biguidess:
-Proush set in the stand.
+ow nive the child, I say in hour sorrow
+Aless then I nake shorours, the mother for men,
+But should grave they seep come that we thee trance shall before.
 
-PRINCE EDWARD:
-Harry of him!
+BUCKINGHAM:
+What you do press three now to do illimal of the heart at a long'd and tear it the feach a winder himselves than of Exile bid
+The cause of my friend.
 
-Say the fair be now repeling
-Which tade in t
+NORTHUMBERLAND:
+O, he not for there's pardon one all your repoly.
+
+ANGE:
+Nay, poor
 
 ==================== MLP (k=32) ====================
-ow nove the come so ceanse as fris dought sirvest.
-I 'Twaysh honestrove more are all the gords
-That a virtless sepiccest in the time.
+ow nove wresce:
+Thou she scee forso, mon me, or the more too,
+To liry her tideroven on the respice.
 
-DETHA GAUN:
-Ay told: if so purge ance.m
-Se print and night: then villing
-And the hrome ancare, should to be reather:
-The nower how good might and let us.
+GLOUCESTER:
 
-ASWINGAE:
-We brother will.
+CAPULET:
+If I this mean: your paint to let
+I do prove sacrimone points norfient:
+The world I weren that the kince his purse than
+I hours cherence:
+Beor good might and love youring disharss brother
+Which in him so and think with must of him!
+Ifal the here be not report.
 
-CORIOLANUS:
-I pance mellius he jorthe park stay?
-
-KING RICHARD III:
-My watardophes
+AUTI:
+Carrophes
 
 ==================== RNN ====================
-ow nover with you, I will not foy, I honous,
-To take of posts of you, and the poor men to very seat and recays in him over at my mother is soul this confectiest days of act my good past livient would villing to righ arm of traisons of the king interchanch and not sogosedving name of you.
+ow nurse to chide, the sen is friends of this bott:
+But passight first his infround the short my husband that seep him to me, my lord, and so did infection of the wagefs command to you nor in this subjecting to rid;
+Art both cullishment.
 
-itied yourself and this and soft.
+CLARENCE:
+I cannot be seen good might.
 
-A Vome pince they have starm not do stand and you are shall have done of th
+QUEEN ELIZABETH:
+Whatse I see the houses for self my hence well had no more of the condiance from his brother wats of Eng
 
 ==================== GRU ====================
-ow, being your good consences forse,
-To you to the goodly short by you
-Show dare an enjoy more seat of your serve:
-Therefore we than the deest of the towe:
-We have see sacryme he pinast lives this suit;
-And when I cannot not call's purse.
+ow, in thy scepter'd with call
+With his foes of that nights, and alroon.
+This poison that villain have drunk dread court.
 
-LADY CAPULET:
-Speak, if I go devil. I will see their brothers
-The mouth the pluck'd so foul pince that hath see
-Is that the earth that arm their house!
-O, thou 
+BUCKINGHAM:
+Well, I'll queen, and ever prove sacrime again,
+Hang no noriolant o' the dear to her boy,
+And, should there is the fear to be revenges he
+prophely tell their rebed.
+
+MENENIUS:
+What's not what a man?
+
+POLIXENES:
+This, my lords with the bands report.
+
+ANGELO:
+You hav
 
 ==================== LSTM ====================
-ow, in the guest somethers and
-Will, to you for the most your officers
-Thou dare all the here my hugh adricess of him of the worth;
-Not not suppelled to us in the word sacrymen happy,
-In repently state like well, and reconders and home;
-I'll prince I cannot be in this chost.
+ow nurse to comfort cannot ne'er
+The longues of the most mother's worship air.
 
-SICINIUS:
-Buting do harse be me or soon in him.
+KING RICHARD III:
+No, no thanks that would revert them and there.
 
-CORIOLANUS:
-I have those than take stand and your runsing you that boon!
-B
+RICHARD:
+Well! prove a common happy spirin and bosom of yours,
+Not in reconders and both by the right,
+Stich a beggar to seeming hanguly will
+bid the cause be much in the sweet selural pince.
+
+KING RICHARD III:
+My lord, and you are not.
+
+AUTOLYCUS:
+Even

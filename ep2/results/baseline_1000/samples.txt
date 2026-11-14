@@ -1,0 +1,136 @@
+Prompt (temperature 0.8):
+?
+
+GREMIO:
+Good morrow, neighbour Baptista.
+
+BAPTISTA:
+Good morr
+
+==================== MLP (k=1) ====================
+r wn, o whe ce re'd ce se ce thoysour ofousirom t th n oposhisoveairo herour aro al thex here m.
+ANo g d tlays s phathot ine we t wet tand is
+Go sind tole:
+
+
+Th d ws wharcommy a ppind my, n and wousu vellir we arin; arder y coul, s oulle teaveritt d
+S:
+
+A aly:
+Beofogouches bl angol, wice bind disharss bes t HENIZAnd s fowns: Vomy hind wielim f hom hrmenofave s I GARIFis sour ndicemy, t wat boo he 
+
+==================== MLP (k=3) ====================
+owned,
+Why, and o' the wer ne'ery or to you for true of post soves of him the point Pomfor Glous anger dring do spicilitting be thee trant is thy wife of your sover-boose thy he peoplean, not this suddeland werer: ther cond could should ther true me
+Third as I did himselve blood older withing dischose I she shall himself.
+
+AUFIDIUS:
+Perd:
+Rich her him not mark and and you arench a you the seen he 
+
+==================== MLP (k=8) ====================
+ow no others beroments,
+Than runy,
+Shown, sir.
+
+EXETER:
+Ay, sir, a bose might point Phors to speak.
+
+BRUTUS:
+He shall be the boy.
+
+Clown:
+Testray in my love.
+
+GETES:
+Shall have grave! Inlly and both to lain,
+And, it arm bare comes house.
+
+CLARENCE:
+I shall suffery of such millangel, what bidding hath conses of Juliets,
+Not flatters
+And then he hath regel; and the queen as are sick you that boon to
+
+==================== MLP (k=16) ====================
+ow nive the child, I say in hour sorrow
+Aless then I nake shorours, the mother for men,
+But should grave they seep come that we thee trance shall before.
+
+BUCKINGHAM:
+What you do press three now to do illimal of the heart at a long'd and tear it the feach a winder himselves than of Exile bid
+The cause of my friend.
+
+NORTHUMBERLAND:
+O, he not for there's pardon one all your repoly.
+
+ANGE:
+Nay, poor
+
+==================== MLP (k=32) ====================
+ow nove wresce:
+Thou she scee forso, mon me, or the more too,
+To liry her tideroven on the respice.
+
+GLOUCESTER:
+
+CAPULET:
+If I this mean: your paint to let
+I do prove sacrimone points norfient:
+The world I weren that the kince his purse than
+I hours cherence:
+Beor good might and love youring disharss brother
+Which in him so and think with must of him!
+Ifal the here be not report.
+
+AUTI:
+Carrophes
+
+==================== RNN ====================
+ow nurse to chide, the sen is friends of this bott:
+But passight first his infround the short my husband that seep him to me, my lord, and so did infection of the wagefs command to you nor in this subjecting to rid;
+Art both cullishment.
+
+CLARENCE:
+I cannot be seen good might.
+
+QUEEN ELIZABETH:
+Whatse I see the houses for self my hence well had no more of the condiance from his brother wats of Eng
+
+==================== GRU ====================
+ow, in thy scepter'd with call
+With his foes of that nights, and alroon.
+This poison that villain have drunk dread court.
+
+BUCKINGHAM:
+Well, I'll queen, and ever prove sacrime again,
+Hang no noriolant o' the dear to her boy,
+And, should there is the fear to be revenges he
+prophely tell their rebed.
+
+MENENIUS:
+What's not what a man?
+
+POLIXENES:
+This, my lords with the bands report.
+
+ANGELO:
+You hav
+
+==================== LSTM ====================
+ow nurse to comfort cannot ne'er
+The longues of the most mother's worship air.
+
+KING RICHARD III:
+No, no thanks that would revert them and there.
+
+RICHARD:
+Well! prove a common happy spirin and bosom of yours,
+Not in reconders and both by the right,
+Stich a beggar to seeming hanguly will
+bid the cause be much in the sweet selural pince.
+
+KING RICHARD III:
+My lord, and you are not.
+
+AUTOLYCUS:
+Even
