@@ -30,12 +30,26 @@ Para fazer essa comparação a tarefa utilizada foi prever o próximo caractere 
 
 \begin{itemize}
     \item 5 redes MLP que recebem os $k$ últimos caracteres e preveem o próximo caractere, para $k \in \{1,3,8,16,32\}$.
-    \item 3 redes recorrentes, uma RNN simples, uma GRU e uma LSTM
+    \item 3 redes recorrentes, uma RNN simples, uma GRU e uma LSTM.
 \end{itemize}
 
-Foram utilizados alguns artifícios para que a comparação seja possível. Isso será melhor explicado ao decorrer do relatório.
+Foram utilizados alguns artifícios para que a comparação seja justa. Isso será melhor explicado no decorrer do relatório.
+
+\subsection{Dados}
+
+O dataset utilizado contém apenas uma sequência longa de texto (aproximadamente 1,1 milhão de caracteres, 65 distintos). Para de fato utilizá-lo, cada caractere distinto que aparece no texto foi traduzido para um token. O dataset foi dividido em 3 sequências contíguas, ficando 80\% dos caracteres para treinamento, 10\% para validação e 10\% para teste. Isso foi feito para que não haja mistura de dados entre as partes mencionadas.
+
+\subsection{Modelos}
+É importante mencionar que todas as redes possuem uma camada inicial que recebe os tokens e cria um embedding a partir deles. O embedding possui o mesmo tamanho para todos os modelos.
+
+Não foi utilizada nenhuma arquitetura rebuscada em nenhum dos casos, os detalhes podem ser encontrados em \href{https://github.com/deconr/MAC5921-DeepLearning/tree/main/ep2/models.py}{\textit{models.py}}.
+
+O código foi implementado de maneira que todos os modelos tenham um número de parâmetros comparável (ajustando o tamanho de uma camada oculta), especificamente próximo de 150 mil (variação menor que 600 para mais ou para menos).
 
 \subsection{Treinamento}
+
+
+\subsection{Resultados}
 
 
 
