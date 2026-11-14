@@ -23,6 +23,19 @@ O código, incluindo este relatório feito em \LaTeX, pode ser encontrado em:
 
 OBS: Considere a mesma declaração sobre o uso de IA feita no \href{https://github.com/deconr/MAC5921-DeepLearning/tree/main/ep1/report/report.tex}{relatório do ep 1}.
 
+\section{Experimentos}
+Nesse EP, entre as opções propostas, decidi explorar redes recorrentes. Os experimentos realizados foram feitos com o intuito de mostrar o desempenho de RNNs em comparação com MLPs em tarefas em que a ordem dos dados importa.
+
+Para fazer essa comparação a tarefa utilizada foi prever o próximo caractere considerando o dataset \href{https://github.com/karpathy/char-rnn/tree/master/data/tinyshakespeare}{\textit{Tiny Shakespeare}}. Construí e treinei 8 redes diferentes:
+
+\begin{itemize}
+    \item 5 redes MLP que recebem os $k$ últimos caracteres e preveem o próximo caractere, para $k \in \{1,3,8,16,32\}$.
+    \item 3 redes recorrentes, uma RNN simples, uma GRU e uma LSTM
+\end{itemize}
+
+Foram utilizados alguns artifícios para que a comparação seja possível. Isso será melhor explicado ao decorrer do relatório.
+
+\subsection{Treinamento}
 
 
 
