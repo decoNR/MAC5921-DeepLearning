@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Debian) (preloaded format=pdflatex 2026.9.30)  14 NOV 2026 23:40
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Debian) (preloaded format=pdflatex 2026.9.30)  15 NOV 2026 03:26
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -290,7 +290,7 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 19.
  [1
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] (/usr/local/google/home/andrenribeiro/projects/usp/MAC5921-DeepLearning/ep2/report/report.aux)
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2] (/usr/local/google/home/andrenribeiro/projects/usp/MAC5921-DeepLearning/ep2/report/report.aux)
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-06-18>
@@ -299,18 +299,18 @@ Package rerunfilecheck Info: File `report.out' has not changed.
 (rerunfilecheck)             Checksum: C728C4DA7BBF1EFB1E3E25249A698AF2;572.
  ) 
 Here is how much of TeX's memory you used:
- 9379 strings out of 469158
- 145642 string characters out of 5460577
+ 9380 strings out of 469158
+ 145648 string characters out of 5460577
  571958 words of memory out of 5000000
  38288 multiletter control sequences out of 15000+600000
  636874 words of font info for 58 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 74i,5n,79p,552b,439s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 74i,5n,79p,552b,495s stack positions out of 10000i,1000n,20000p,200000b,200000s
  </usr/local/google/home/andrenribeiro/.texlive2026/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk> </usr/local/google/home/andrenribeiro/.texlive2026/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1095.600pk> </usr/local/google/home/andrenribeiro/.texlive2026/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1095.600pk> </usr/local/google/home/andrenribeiro/.texlive2026/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm0800.600pk> </usr/local/google/home/andrenribeiro/.texlive2026/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1095.600pk> </usr/local/google/home/andrenribeiro/.texlive2026/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk> </usr/local/google/home/andrenribeiro/.texlive2026/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk> </usr/local/google/home/andrenribeiro/.texlive2026/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1728.600pk></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on /usr/local/google/home/andrenribeiro/projects/usp/MAC5921-DeepLearning/ep2/report/report.pdf (1 page, 83273 bytes).
+Output written on /usr/local/google/home/andrenribeiro/projects/usp/MAC5921-DeepLearning/ep2/report/report.pdf (2 pages, 84660 bytes).
 PDF statistics:
- 260 PDF objects out of 1000 (max. 8388607)
- 81 compressed objects within 1 object stream
- 8 named destinations out of 1000 (max. 500000)
+ 265 PDF objects out of 1000 (max. 8388607)
+ 84 compressed objects within 1 object stream
+ 9 named destinations out of 1000 (max. 500000)
  49 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -16,7 +16,7 @@
 
 \section{Código}
 
-O código, incluindo este relatório feito em \LaTeX, pode ser encontrado em:
+O código, incluindo este relatório feito em \LaTeX e o resultado dos experimentos, pode ser encontrado em:
 \begin{itemize}
 \item \href{https://github.com/deconr/MAC5921-DeepLearning/tree/main/ep2}{https://github.com/deconr/MAC5921-DeepLearning/tree/main/ep2}.
 \end{itemize}
@@ -47,7 +47,14 @@ Não foi utilizada nenhuma arquitetura rebuscada em nenhum dos casos, os detalhe
 O código foi implementado de maneira que todos os modelos tenham um número de parâmetros comparável (ajustando o tamanho de uma camada oculta), especificamente próximo de 150 mil (variação menor que 600 para mais ou para menos).
 
 \subsection{Treinamento}
+O treinamento exige pares (x,y) diferentes para os diferentes tipos de rede:
 
+\begin{itemize}
+    \item MLP: Foram montados pares (x,y) sendo x de tamanho k caracteres e y o caractere que aparece depois de x no texto.
+    \item RNN: Foram montados pares (x,y) tal que x é uma sequência de 100 caracteres e y é a mesma sequência porém deslocada em um caractere para frente. Nesse caso a RNN prevê o próximo token para todos os tokens de x.
+\end{itemize}
+
+De modo a deixar a comparação justa os modelos foram treinados com o mesmo número de batches por época, o que traduz no mesmo número de atualizações dos pesos. Além disso, o código foi feito de modo que o mesmo número de caracteres fosse previsto por batch, ou seja, as RNNs tiveram 100 vezes menos pares de treino que os MLPs dado que um par para as RNNs traduz em prever 100 caracteres.
 
 \subsection{Resultados}
 
