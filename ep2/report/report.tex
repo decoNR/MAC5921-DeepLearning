@@ -54,9 +54,28 @@ O treinamento exige pares (x,y) diferentes para os diferentes tipos de rede:
     \item RNN: Foram montados pares (x,y) tal que x é uma sequência de 100 caracteres e y é a mesma sequência porém deslocada em um caractere para frente. Nesse caso a RNN prevê o próximo token para todos os tokens de x.
 \end{itemize}
 
-De modo a deixar a comparação justa os modelos foram treinados com o mesmo número de batches por época, o que traduz no mesmo número de atualizações dos pesos. Além disso, o código foi feito de modo que o mesmo número de caracteres fosse previsto por batch, ou seja, as RNNs tiveram 100 vezes menos pares de treino que os MLPs dado que um par para as RNNs traduz em prever 100 caracteres.
+De modo a deixar a comparação justa os modelos foram treinados com o mesmo número de batches por época, o que se traduz no mesmo número de atualizações dos pesos. Além disso, o código foi feito de modo que o mesmo número de caracteres fosse previsto por batch, ou seja, as RNNs tiveram 100 vezes menos pares de treino que os MLPs dado que um par para as RNNs se traduz em prever 100 caracteres.
+
+Vale ressaltar que foi utilizado gradient clip de modo a restringir a norma do gradiente a no máximo 1 para evitar o problema de explosão do gradiente.
 
 \subsection{Resultados}
+
+Os resultados estão presentes nos arquivos \textit{history.json} e \textit{summary.json}, além dos gráficos em \textit{curves.png}. Esses arquivos se encontram dentro da pasta de cada experimento em \href{https://github.com/deconr/MAC5921-DeepLearning/tree/main/ep2/results/}{\textit{ep2/results}}.
+
+Em relação à loss e acurácia durante o treinamento (avaliada em dados de treinamento e validação) percebe-se que:
+
+\begin{itemize}
+    \item MLPs: para k igual a 1 a curva é significativamente pior do que para as outras redes. Algo interessante é que a curva que apresenta melhores resultados nessas métricas não é a associada ao maior k. O MLP com melhor resultado foi com o k = 8. Possivelmente isso ocorre pois o maior k significa um menor número de neurônios na camada oculta já que a camada anterior tem que ser maior. Intuitivamente parece gastar muitos parâmetros para codificar toda a entrada mas nem todos são necessários para prever o próximo.
+    \item RNNs: Considerando a validação para as últimas épocas, todas as 3 redes apresentaram resultados melhores que qualquer MLP. Um outro ponto interessante é que a LSTM, apesar de atingir um dos melhores valores, demorou mais para convergir. Pelo que li, uma possibilidade pode ser a inicialização dos valores dos gates de esquecimento, que começam ``longe'' do valor aprendido.
+    \item Geral: Percebe-se que os MLPs parecem ser mais suscetíveis ao overfitting (considerando k > 3) dado que o resultado comparativo para as curvas de treinamento é melhor do que as para as curvas de validação. 
+\end{itemize}
+
+Por fim, considerando a acurácia nos dados de teste (utilizando os pesos da melhor época), também foi observada uma superioridade das RNNs. \newline
+
+*obs: Foram realizados dois experimentos mudando apenas os dados de avaliação para as RNNs (validação e teste), que deixaram de ser sequências de 100 caracteres e passaram a ser sequências de 1000 caracteres. A ideia foi ter mais previsões em que as RNNs tinham um contexto maior. Os resultados comparativos foram semelhantes e por isso não mencionei especificamente cada um.
+
+*obs: Apesar de não incluir essa descrição no relatório, esse EP foi uma boa oportunidade para entender melhor como funciona uma RNN simples e as outras duas variações abordadas (GRU e LSTM). 
+
 
 
 
