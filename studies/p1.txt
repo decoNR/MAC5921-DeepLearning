@@ -15,6 +15,9 @@
     - L1 (Lasso): R(w) = Σ |w_j|; tende a zerar pesos (solução esparsa, seleção de features).
     - Outras: dropout, early stopping, data augmentation.
 - Ensembles: combinam as previsões de vários modelos (votação/média) para obter um modelo melhor que cada um isoladamente.
+- Estimar melhores hiperparâmetros (e o desempenho em dados não vistos):
+    - Hold-out validation: separa os dados uma única vez em treino / validação / teste; treina no conjunto de treino, escolhe hiperparâmetros e modelos pelo desempenho na validação e reporta o desempenho final no teste (usado só no fim). Simples e barato, mas a estimativa depende de qual divisão foi sorteada e desperdiça dados (bom quando há muitos dados).
+    - Cross validation: (k-fold) divide os dados em k partes (folds); treina k vezes, cada vez usando uma parte diferente como validação e as outras k-1 como treino, e tira a média do desempenho. Estimativa mais confiável (menor variância) e usa todos os dados para treino e validação, mas custa k treinos (bom quando há poucos dados; menos usado em deep learning pelo custo).
 
 # Redes Neurais
 
