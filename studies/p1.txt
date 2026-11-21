@@ -2,11 +2,19 @@
 
 - Modelos de Classificação: predizem entre um grupo de classes qual é a classe associada ao input
     - Classificação linear: divide o espaço por hiperplanos e prevê as classes baseadas em qual "lado" do hiperplano o ponto associado ao input está.
-    - Regressão logística (utilizada para classificação após definir um threshold): calcula z = w·x + b e aplica a sigmoide σ(z) = 1/(1+e^(-z)), obtendo P(y=1|x) ∈ (0,1); treinada minimizando a entropia cruzada (máxima verossimilhança). A fronteira de decisão (σ(z) = 0.5 ⇔ z = 0) é um hiperplano, logo é um classificador linear. Para várias classes usa-se softmax.
+    - Regressão logística (utilizada para classificação após definir um threshold): calcula z = w·x + b e aplica a sigmoide σ(z) = 1/(1+e^(-z)), obtendo P(y=1|x) ∈ (0,1); treinada minimizando a entropia cruzada (máxima verossimilhança). A fronteira de decisão é um hiperplano, logo é um classificador linear. Para várias classes usa-se softmax.
 - Modelos de Regressão: predizem um valor contínuo para um dado input
     - Regressão Linear: encontra o hiperplano que melhor se ajusta aos dados (ex.: minimizando o erro quadrático médio); dado um input, a previsão é o valor correspondente a esse input no hiperplano.
 - Teorema de Bayes: atualiza uma probabilidade dado um fato observado, restringindo o espaço amostral aos casos em que o fato ocorre.
 - Modelos gerativos / discriminativos: gerativos modelam como os dados são gerados (P(x|y) e P(y), ou P(x,y)), podendo gerar novos exemplos; discriminativos modelam diretamente P(y|x) (ou a fronteira de decisão) para decidir uma classe ou valor para um input.
+- MSE / MAE : erro quadrático médio e erro absoluto médio, funções de custo para regressão.
+    - MSE: penaliza muito erros grandes (sensível a outliers); diferenciável em todo ponto.
+    - MAE: penaliza erros linearmente (mais robusto a outliers); não diferenciável em 0.
+- Regularização: técnicas para reduzir overfitting (melhorar generalização), em geral restringindo a complexidade do modelo, por exemplo adicionando à função de custo uma penalidade sobre os pesos (com pesos grandes pequenas mudanças no input geram resultados muito diferentes): L = L_dados + λ·R(w), com λ controlando o trade-off viés/variância.
+    - L2 (Ridge / weight decay): R(w) = Σ w_j²; encolhe todos os pesos em direção a 0, sem zerá-los.
+    - L1 (Lasso): R(w) = Σ |w_j|; tende a zerar pesos (solução esparsa, seleção de features).
+    - Outras: dropout, early stopping, data augmentation.
+- Ensembles: combinam as previsões de vários modelos (votação/média) para obter um modelo melhor que cada um isoladamente.
 
 # Redes Neurais
 
