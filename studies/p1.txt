@@ -1,1 +1,10 @@
-## NN
+# Requisitos
+
+- Modelos de Classificação: predizem entre um grupo de classes qual é a classe associada ao input
+    - Classificação linear: divide o espaço por hiperplanos e prevê as classes baseadas em qual "lado" do hiperplano o ponto associado ao input está.
+- Modelos de Regressão: predizem um valor contínuo para um dado input
+    - Regressão Linear: encontra o hiperplano que melhor se ajusta aos dados (ex.: minimizando o erro quadrático médio); dado um input, a previsão é o valor correspondente a esse input no hiperplano.
+
+# Redes Neurais
+
+
