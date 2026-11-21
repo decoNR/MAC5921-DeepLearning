@@ -20,5 +20,14 @@
     - Cross validation: (k-fold) divide os dados em k partes (folds); treina k vezes, cada vez usando uma parte diferente como validação e as outras k-1 como treino, e tira a média do desempenho. Estimativa mais confiável (menor variância) e usa todos os dados para treino e validação, mas custa k treinos (bom quando há poucos dados; menos usado em deep learning pelo custo).
 
 # Redes Neurais
+- Normalização: colocar os valores numa escala comum (ex.: média 0 e variância 1) para estabilizar e acelerar o treino.
+    - Normalizar os inputs faz com que a rede não propague mais sinais (e gradientes maiores) somente pq uma feature tem escala maior.
+    - Batch normalization: mesma ideia de normalizar o input, mas aplicada dentro da rede, na entrada de cada layer.
+        - Problema: como os pesos das camadas anteriores mudam durante o treino, a escala dos valores que chegam em cada layer fica mudando, e o layer fica "correndo atrás" de um alvo móvel.
+        - Solução: para cada neurônio, pega os valores do batch atual, subtrai a média e divide pelo desvio padrão por exemplo.
+        - Depois multiplica por γ e soma β (aprendidos), para a rede escolher a melhor escala: y = γ·(h - μ_batch)/σ_batch + β.
+        - Na inferência (pode haver só 1 exemplo) usa a média e o desvio acumulados durante o treino.
+        - Resultado: treino mais rápido e estável (permite learning rates maiores) e leve efeito regularizador.
+- Otimizador: como atualizar os pesos da rede dado um certo gradiente.
 
 
