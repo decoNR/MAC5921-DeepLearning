@@ -40,21 +40,29 @@
 
 - Convolução: 
     - Detectar padrões aprendidos pelos kernels.
-    - 1x1 ou "point wise": a combinação ocorre entre os pixels de diferentes canais (que estão na mesma linha). Pode-se também aplicar kernels diferentes nos diferentes canais, combinando ou não os valores dos diferentes canais.
+    - 1x1 ou "point wise": combinação linear entre os canais de cada pixel (mesma posição espacial); usada para mudar o nº de canais. Aplicar um kernel por canal sem combiná-los é a "depthwise convolution"; depthwise + pointwise = "depthwise separable".
     - Kernels podem ser usados para fazer upsampling também. Nesse caso também podem ser treinados pela rede. É chamado também de "transposed convolution"
-- Stride: número de pixels que a convulução pula ao passar pela imagem
+- Stride: número de pixels que a convolução pula ao passar pela imagem
 - Feature map: output de layers intermediários da rede. No caso de convoluções elas também são imagens e são os sinais que a rede "deixou passar" após as camadas. Cada filtro gera um feature map.
 - Inception: utiliza diferentes tamanhos de kernel em um mesmo layer. Intuitivamente a rede tem a oportunidade de "usar" diferentes tamanhos de filtros. As saídas dos ramos são concatenadas.
-- Tranformações residuais: criar uma "skip" connection de modo a facilitar a rede a aprender transformações de identidade.Ajudou a treinar redes com mais camadas sem degradação do resultado. Pode se dizer que ajuda no flow do gradiente também.
+- Transformações residuais: criar uma "skip" connection (y = F(x) + x) de modo a facilitar a rede a aprender transformações de identidade (basta F(x) = 0). Ajudou a treinar redes com mais camadas sem degradação do resultado. Pode se dizer que ajuda no flow do gradiente também.
 - Dropout: "desligar" uma porcentagem aleatoria dos neurônios da rede. Intuitivamente isso força a rede a ser mais resiliente ("usar caminhos alternativos" em predições semelhantes).
 - Segmentação de imagem: 
     - Sliding window: patches são recortes da imagem que são utilizados para classificar cada pixel.
     - Gerar a imagem segmentada com uma CNN construíndo a imagem segmentada a partir das features geradas pela rede. Unet é uma arquitetura que funcionou nesse caso (possui skip connections). É um exemplo de encoder-decoder. De forma mais genérica, pode ser usada para problemas de tranformação imagem para imagem.
     - Além de usar loss considerando erro pixel a pixel também se utiliza IoU.
 - Detecção de objetos: 
-    - Classificação com previsão de bounding boxes (Yolo).
-    - R-CNN: detecção em dois estágios. Primeiro extrai regiões que provavelmente tem algum objeto e depois da a probabilidade de cada classe em cada região.
+    - YOLO: um estágio; divide a imagem em grade e cada célula prevê caixas (regressão) e classes numa única passada. Mais rápido, porém menos preciso em objetos pequenos (v1).
+    - R-CNN: detecção em dois estágios. Primeiro extrai regiões que provavelmente tem algum objeto (selective search, ~2000) e depois cada região passa pela CNN para obter a classe e o ajuste da caixa.
         - Lento pois muitas regiões se intersectam e os calculos são repetidos para esses casos. 
         - Fast R-CNN: passa a imagem inteira uma vez pela CNN; projeta as propostas (RoI = Region of Interest, região candidata) no feature map; RoI Pooling converte cada uma para tamanho fixo; FC → classe + ajuste da caixa.
         - Faster R-CNN: troca o selective search por uma Region Proposal Network (RPN) sobre o mesmo feature map; usa anchors (escalas/proporções) e prevê objectness + ajuste da caixa. Tudo aprendido, quase tempo real.
 - Precision recall curve: precision = TP/(TP+FP), recall = TP/(TP+FN); varia-se o threshold de confiança (alto → mais precision, menos recall). AP = área sob a curva; mAP = média do AP entre classes. Em detecção, TP exige IoU ≥ limiar (ex.: 0.5).
+
+# Explainable AI 
+
+- Oclusão (occlusion sensitivity): cobrir partes da imagem e ver o quanto a predição muda; queda grande → região importante.
+- Attribution map / mapa de saliência: busca entender qual parte da imagem é mais relevante para a predição. Derivada do score da classe em relação a cada pixel.
+- Integrated gradients: resolve o problema do gradiente ser ~0 em regiões flat (saturação). Integra os gradientes ao longo do caminho de uma baseline (ex.: imagem preta) até a imagem real.
+- CAM (Class activation map): mapa de calor = soma dos feature maps da última conv ponderados pelos pesos da classe na camada final. Exige arquitetura conv → global average pooling → FC (às vezes retreino).
+    - Grad-CAM: os pesos de cada canal vêm da média dos gradientes do score da classe em relação ao feature map (+ ReLU). Funciona em qualquer CNN, sem mudar a arquitetura nem retreinar.
