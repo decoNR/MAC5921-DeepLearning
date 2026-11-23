@@ -59,6 +59,7 @@
         - Faster R-CNN: troca o selective search por uma Region Proposal Network (RPN) sobre o mesmo feature map; usa anchors (escalas/proporções) e prevê objectness + ajuste da caixa. Tudo aprendido, quase tempo real.
 - Precision recall curve: precision = TP/(TP+FP), recall = TP/(TP+FN); varia-se o threshold de confiança (alto → mais precision, menos recall). AP = área sob a curva; mAP = média do AP entre classes. Em detecção, TP exige IoU ≥ limiar (ex.: 0.5).
 
+
 # Explainable AI 
 
 - Oclusão (occlusion sensitivity): cobrir partes da imagem e ver o quanto a predição muda; queda grande → região importante.
@@ -66,3 +67,10 @@
 - Integrated gradients: resolve o problema do gradiente ser ~0 em regiões flat (saturação). Integra os gradientes ao longo do caminho de uma baseline (ex.: imagem preta) até a imagem real.
 - CAM (Class activation map): mapa de calor = soma dos feature maps da última conv ponderados pelos pesos da classe na camada final. Exige arquitetura conv → global average pooling → FC (às vezes retreino).
     - Grad-CAM: os pesos de cada canal vêm da média dos gradientes do score da classe em relação ao feature map (+ ReLU). Funciona em qualquer CNN, sem mudar a arquitetura nem retreinar.
+
+
+# RNN 
+
+- Beam search: não é uma RNN, é um algoritmo de decodificação usado na inferência de qualquer modelo autoregressivo (decoder RNN, Transformer, LLM). Em vez de escolher só o token mais provável a cada passo (greedy), mantém as k sequências parciais com maior probabilidade acumulada (soma dos log-probs) e no fim escolhe a melhor. k = 1 equivale ao greedy.
+- Attention em RNNs (tarefas seq2seq): em vez de comprimir a frase toda num único vetor de contexto (gargalo), a cada passo t o decoder calcula um contexto próprio c_t = Σ α_{t,i}·h_i, uma média ponderada dos estados h_i do encoder, focando nos tokens de entrada mais relevantes para aquele passo.
+    - Função de alinhamento: é o score e_{t,i} = a(s_{t-1}, h_i), que mede o quanto o estado do decoder s_{t-1} "combina" com cada h_i. Os pesos são α_{t,i} = softmax_i(e_{t,i}). A forma é escolhida; se tiver parâmetros (W, U, v) eles são aprendidos, senão a rede aprende os próprios s e h. A matriz de α mostra o alinhamento entre as palavras de origem e de destino.
