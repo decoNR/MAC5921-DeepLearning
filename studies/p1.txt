@@ -78,5 +78,22 @@
 
 # Tokenização
 
+- WordPiece: tokenização por subpalavras parecida com o BPE (usada no BERT). Também junta pares iterativamente, mas escolhe o par que mais aumenta a verossimilhança do corpus (score = freq(ab) / (freq(a)·freq(b))), e não só o mais frequente. Pedaços no meio da palavra recebem o prefixo "##" (ex.: "playing" → "play" + "##ing").
 - BPE (Byte Pair Encoding): tokenização por subpalavras. Começa com o vocabulário de caracteres (ou bytes) e, repetidamente, junta o par adjacente mais frequente no corpus num novo token, até atingir o tamanho de vocabulário desejado. Para tokenizar texto novo, aplica as junções aprendidas na mesma ordem.
     - Meio-termo entre caracteres (sequências longas) e palavras (vocabulário enorme, palavras desconhecidas): palavras comuns viram 1 token, raras são quebradas em pedaços (ex.: "desconhecido" → "des" + "conhec" + "ido"). Nunca há token desconhecido (no pior caso cai em caracteres/bytes). Usado no GPT.
+
+
+# Transformers
+
+- Elimina recorrência: os tokens não são processados em sequência, e sim todos em paralelo. Como a ordem se perde, soma-se um positional encoding aos embeddings.
+- Introduz self-attention: cada token "olha" para todos os tokens da mesma sequência e monta sua nova representação como média ponderada deles (atenção da sequência consigo mesma).
+    - Cada token gera 3 vetores por projeções aprendidas: Q = XW_Q (query), K = XW_K (key), V = XW_V (value). X é a matriz T × d com uma linha por token.
+    - Attention(Q, K, V) = softmax(QKᵀ / √d_k)·V: o score é o produto escalar query·key (função de alinhamento); √d_k evita valores grandes que saturam o softmax.
+    - Multi-head: várias atenções em paralelo com projeções diferentes (cada uma captura um tipo de relação), concatenadas no fim.
+    - No decoder usa-se máscara causal (token só vê os anteriores). Essencial no treino, em que cada posição t prevê o token t+1 em paralelo e não pode ver a resposta. Na inferência também é usada quando o prompt é processado de uma vez; ao gerar token a token, o futuro ainda não existe.
+- Positional encoding: vetor somado ao embedding de cada token indicando sua posição (sem ele a self-attention não distingue ordem: "cão morde homem" = "homem morde cão").
+    - Senoidal (original): PE(pos, 2i) = sin(pos / 10000^(2i/d)), PE(pos, 2i+1) = cos(...); fixo, cada dimensão com uma frequência diferente.
+    - Aprendido (BERT, GPT-2): um embedding por posição, treinado. Variantes atuais codificam posição relativa (ex.: RoPE).
+- BERT (Bidirectional Encoder Representations from Transformers): Transformer só com encoder (sem máscara causal, cada token vê o contexto dos dois lados). Serve para gerar representações contextualizadas de texto, não para gerar texto.
+    - Pré-treino auto-supervisionado: Masked Language Modeling (esconde ~15% dos tokens e prevê quais eram) + Next Sentence Prediction (a frase B segue a A?).
+    - Depois faz fine-tuning em tarefas específicas (classificação, análise de sentimento, NER, perguntas e respostas), geralmente usando a saída do token especial [CLS] para classificação.
