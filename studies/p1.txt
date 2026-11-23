@@ -100,3 +100,18 @@
 - GPT (Generative Pre-trained Transformer): Transformer só com decoder (sem cross-attention), treinado para prever o próximo token.
     - Por que sem encoder: a tarefa é continuar um texto, não transformar uma sequência de origem em outra. Não há "frase de origem" separada; o prompt é só o começo da sequência, processado pelo mesmo decoder com máscara causal.
     - Vantagens: arquitetura mais simples; todo token do texto gera sinal de treino (aprende com texto bruto, sem pares); qualquer tarefa pode ser formulada como continuação de texto (tradução, resumo, QA); escala bem.
+- CLIP: alinhamento de texto e imagem. Um encoder de imagem e um de texto mapeiam ambos para o mesmo espaço de embeddings; treinado com aprendizado contrastivo em pares (imagem, legenda). Permite classificação zero-shot (compara a imagem com textos tipo "foto de um cachorro") e é usado como encoder de texto em geradores de imagem.
+- Aprendizado contrastivo: aprender um espaço de embeddings (representação) em que pares positivos (ex.: imagem e sua legenda, ou duas versões aumentadas da mesma imagem) fiquem próximos e pares negativos (outros exemplos do batch) fiquem distantes. Não precisa de rótulos de classe.
+
+
+# Modelos gerativos
+
+- GAN (Generative Adversarial Network): duas redes treinadas em competição. O gerador G transforma ruído z em uma amostra falsa; o discriminador D tenta distinguir reais de falsas. G é treinado para enganar D. Gera amostras nítidas, mas o treino é instável (ex.: mode collapse, quando G gera pouca variedade).
+- VAE (Variational Autoencoder): autoencoder probabilístico. O encoder mapeia x para uma distribuição no espaço latente (média μ e variância σ²), amostra z dela (reparametrization trick: z = μ + σ·ε, para conseguir propagar o gradiente) e o decoder reconstrói x a partir de z.
+    - Loss = erro de reconstrução + KL(q(z|x) ‖ N(0, I)): a KL força o espaço latente a ser contínuo e próximo de uma normal, então é possível gerar dados novos amostrando z ~ N(0, I) e passando pelo decoder.
+    - Treino estável, mas as amostras costumam ser mais borradas que as de GANs.
+- Diffusion models: geram dados revertendo um processo gradual de adição de ruído.
+    - Forward (fixo, sem aprendizado): adiciona ruído gaussiano à imagem em T passos (ex.: 1000) até virar ruído puro.
+    - Reverse (aprendido): uma rede (geralmente U-Net ou Transformer/DiT) recebe a imagem ruidosa x_t e o passo t e prevê o ruído ε adicionado; loss = MSE entre o ruído real e o previsto.
+    - Geração: começa de ruído puro e remove o ruído passo a passo. Amostras de alta qualidade e variadas, treino estável, mas inferência lenta (muitos passos).
+    - Condicionamento (ex.: texto via CLIP + cross-attention) permite text-to-image. Stable Diffusion faz a difusão no espaço latente de um autoencoder (mais barato).
