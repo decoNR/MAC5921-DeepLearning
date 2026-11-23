@@ -73,4 +73,10 @@
 
 - Beam search: não é uma RNN, é um algoritmo de decodificação usado na inferência de qualquer modelo autoregressivo (decoder RNN, Transformer, LLM). Em vez de escolher só o token mais provável a cada passo (greedy), mantém as k sequências parciais com maior probabilidade acumulada (soma dos log-probs) e no fim escolhe a melhor. k = 1 equivale ao greedy.
 - Attention em RNNs (tarefas seq2seq): em vez de comprimir a frase toda num único vetor de contexto (gargalo), a cada passo t o decoder calcula um contexto próprio c_t = Σ α_{t,i}·h_i, uma média ponderada dos estados h_i do encoder, focando nos tokens de entrada mais relevantes para aquele passo.
-    - Função de alinhamento: é o score e_{t,i} = a(s_{t-1}, h_i), que mede o quanto o estado do decoder s_{t-1} "combina" com cada h_i. Os pesos são α_{t,i} = softmax_i(e_{t,i}). A forma é escolhida; se tiver parâmetros (W, U, v) eles são aprendidos, senão a rede aprende os próprios s e h. A matriz de α mostra o alinhamento entre as palavras de origem e de destino.
+    - Função de alinhamento: é o score e_{t,i} = a(s_{t-1}, h_i), que mede o quanto o estado do decoder s_{t-1} "combina" com cada h_i. Os pesos são α_{t,i} = softmax_i(e_{t,i}). A forma é escolhida; se tiver parâmetros (ex.: aditiva vᵀ·tanh(W·s + U·h)) eles são aprendidos, senão (produto escalar, cosseno) a rede aprende os próprios s e h. A matriz de α mostra o alinhamento entre as palavras de origem e de destino.
+
+
+# Tokenização
+
+- BPE (Byte Pair Encoding): tokenização por subpalavras. Começa com o vocabulário de caracteres (ou bytes) e, repetidamente, junta o par adjacente mais frequente no corpus num novo token, até atingir o tamanho de vocabulário desejado. Para tokenizar texto novo, aplica as junções aprendidas na mesma ordem.
+    - Meio-termo entre caracteres (sequências longas) e palavras (vocabulário enorme, palavras desconhecidas): palavras comuns viram 1 token, raras são quebradas em pedaços (ex.: "desconhecido" → "des" + "conhec" + "ido"). Nunca há token desconhecido (no pior caso cai em caracteres/bytes). Usado no GPT.
