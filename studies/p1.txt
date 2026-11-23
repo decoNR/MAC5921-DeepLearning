@@ -97,3 +97,6 @@
 - BERT (Bidirectional Encoder Representations from Transformers): Transformer só com encoder (sem máscara causal, cada token vê o contexto dos dois lados). Serve para gerar representações contextualizadas de texto, não para gerar texto.
     - Pré-treino auto-supervisionado: Masked Language Modeling (esconde ~15% dos tokens e prevê quais eram) + Next Sentence Prediction (a frase B segue a A?).
     - Depois faz fine-tuning em tarefas específicas (classificação, análise de sentimento, NER, perguntas e respostas), geralmente usando a saída do token especial [CLS] para classificação.
+- GPT (Generative Pre-trained Transformer): Transformer só com decoder (sem cross-attention), treinado para prever o próximo token.
+    - Por que sem encoder: a tarefa é continuar um texto, não transformar uma sequência de origem em outra. Não há "frase de origem" separada; o prompt é só o começo da sequência, processado pelo mesmo decoder com máscara causal.
+    - Vantagens: arquitetura mais simples; todo token do texto gera sinal de treino (aprende com texto bruto, sem pares); qualquer tarefa pode ser formulada como continuação de texto (tradução, resumo, QA); escala bem.
