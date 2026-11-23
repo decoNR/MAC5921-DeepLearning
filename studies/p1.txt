@@ -18,16 +18,43 @@
 - Estimar melhores hiperparâmetros (e o desempenho em dados não vistos):
     - Hold-out validation: separa os dados uma única vez em treino / validação / teste; treina no conjunto de treino, escolhe hiperparâmetros e modelos pelo desempenho na validação e reporta o desempenho final no teste (usado só no fim). Simples e barato, mas a estimativa depende de qual divisão foi sorteada e desperdiça dados (bom quando há muitos dados).
     - Cross validation: (k-fold) divide os dados em k partes (folds); treina k vezes, cada vez usando uma parte diferente como validação e as outras k-1 como treino, e tira a média do desempenho. Estimativa mais confiável (menor variância) e usa todos os dados para treino e validação, mas custa k treinos (bom quando há poucos dados; menos usado em deep learning pelo custo).
+- trade-off viés/variância: aumentar a complexidade do modelo reduz o viés e aumenta a variância.
+
 
 # Redes Neurais
+
 - Normalização: colocar os valores numa escala comum (ex.: média 0 e variância 1) para estabilizar e acelerar o treino.
     - Normalizar os inputs faz com que a rede não propague mais sinais (e gradientes maiores) somente pq uma feature tem escala maior.
     - Batch normalization: mesma ideia de normalizar o input, mas aplicada dentro da rede, na entrada de cada layer.
         - Problema: como os pesos das camadas anteriores mudam durante o treino, a escala dos valores que chegam em cada layer fica mudando, e o layer fica "correndo atrás" de um alvo móvel.
-        - Solução: para cada neurônio, pega os valores do batch atual, subtrai a média e divide pelo desvio padrão por exemplo.
+        - Solução: para cada neurônio, pega os valores do batch atual, subtrai a média e divide pelo desvio padrão.
         - Depois multiplica por γ e soma β (aprendidos), para a rede escolher a melhor escala: y = γ·(h - μ_batch)/σ_batch + β.
         - Na inferência (pode haver só 1 exemplo) usa a média e o desvio acumulados durante o treino.
         - Resultado: treino mais rápido e estável (permite learning rates maiores) e leve efeito regularizador.
+    - Normalização (z-score) não muda a forma da distribuição: só desloca e reescala (assimetria, picos e outliers se mantêm; não vira gaussiana).
 - Otimizador: como atualizar os pesos da rede dado um certo gradiente.
+- Viés indutivo: suposições que o modelo faz sobre os dados que guiam a modelagem. É o conjunto de suposições e premissas que o algoritmo de aprendizado utiliza para fazer previsões.
 
 
+# CNN 
+
+- Convolução: 
+    - Detectar padrões aprendidos pelos kernels.
+    - 1x1 ou "point wise": a combinação ocorre entre os pixels de diferentes canais (que estão na mesma linha). Pode-se também aplicar kernels diferentes nos diferentes canais, combinando ou não os valores dos diferentes canais.
+    - Kernels podem ser usados para fazer upsampling também. Nesse caso também podem ser treinados pela rede. É chamado também de "transposed convolution"
+- Stride: número de pixels que a convulução pula ao passar pela imagem
+- Feature map: output de layers intermediários da rede. No caso de convoluções elas também são imagens e são os sinais que a rede "deixou passar" após as camadas. Cada filtro gera um feature map.
+- Inception: utiliza diferentes tamanhos de kernel em um mesmo layer. Intuitivamente a rede tem a oportunidade de "usar" diferentes tamanhos de filtros. As saídas dos ramos são concatenadas.
+- Tranformações residuais: criar uma "skip" connection de modo a facilitar a rede a aprender transformações de identidade.Ajudou a treinar redes com mais camadas sem degradação do resultado. Pode se dizer que ajuda no flow do gradiente também.
+- Dropout: "desligar" uma porcentagem aleatoria dos neurônios da rede. Intuitivamente isso força a rede a ser mais resiliente ("usar caminhos alternativos" em predições semelhantes).
+- Segmentação de imagem: 
+    - Sliding window: patches são recortes da imagem que são utilizados para classificar cada pixel.
+    - Gerar a imagem segmentada com uma CNN construíndo a imagem segmentada a partir das features geradas pela rede. Unet é uma arquitetura que funcionou nesse caso (possui skip connections). É um exemplo de encoder-decoder. De forma mais genérica, pode ser usada para problemas de tranformação imagem para imagem.
+    - Além de usar loss considerando erro pixel a pixel também se utiliza IoU.
+- Detecção de objetos: 
+    - Classificação com previsão de bounding boxes (Yolo).
+    - R-CNN: detecção em dois estágios. Primeiro extrai regiões que provavelmente tem algum objeto e depois da a probabilidade de cada classe em cada região.
+        - Lento pois muitas regiões se intersectam e os calculos são repetidos para esses casos. 
+        - Fast R-CNN: passa a imagem inteira uma vez pela CNN; projeta as propostas (RoI = Region of Interest, região candidata) no feature map; RoI Pooling converte cada uma para tamanho fixo; FC → classe + ajuste da caixa.
+        - Faster R-CNN: troca o selective search por uma Region Proposal Network (RPN) sobre o mesmo feature map; usa anchors (escalas/proporções) e prevê objectness + ajuste da caixa. Tudo aprendido, quase tempo real.
+- Precision recall curve: precision = TP/(TP+FP), recall = TP/(TP+FN); varia-se o threshold de confiança (alto → mais precision, menos recall). AP = área sob a curva; mAP = média do AP entre classes. Em detecção, TP exige IoU ≥ limiar (ex.: 0.5).
